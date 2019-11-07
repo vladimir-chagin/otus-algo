@@ -1,0 +1,58 @@
+
+<input> 1111 111
+
+READ 0
+JZ exit0; 
+STORE 1
+READ 0
+JZ exit0;
+STORE 2
+;detect min max
+SUB 1
+JGTZ max_2	; if max in r2
+max1:;	  if max in r1
+load 1
+store 3; 	r3 <- max
+load 2
+store 4;	r4 <- min
+JMP before_loop
+
+max_2:
+LOAD 2
+STORE 3;	r3 <- max
+LOAD 1
+STORE 4;	r4 <- min	
+
+before_loop:
+
+LOAD 3;
+STORE 5;
+
+LOAD 4
+SUB =1
+STORE 4;
+
+loop:
+LOAD 4
+JZ exit
+
+LOAD 5
+ADD 3
+STORE 5;
+
+LOAD 4;
+SUB =1
+STORE 4
+
+JMP loop;
+
+exit:
+WRITE 5
+halt
+
+WRITE 0
+HALT
+exit0:
+
+WRITE =0
+HALT

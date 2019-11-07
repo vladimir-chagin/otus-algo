@@ -1,0 +1,71 @@
+;division
+<input> 0 0
+
+read 0;
+store 1;
+read 0;
+jz exit;
+store 2;
+
+load 1;
+jz exit_0;
+
+load 2;
+sub 1;
+
+jgtz exit_1
+jz exit_2;
+
+load 2;
+sub =1;
+jz exit_3;
+
+
+load =0;
+store 3;
+
+loop:
+	load 1;
+	sub 2;
+	jgtz next;
+	jmp exit_4;
+next:
+	store 1;
+	;load 1;
+	jgtz inc_int;
+	jmp loop;
+
+inc_int:
+	load 3;
+	add =1;
+	store 3;
+	jmp loop;
+	
+
+exit_0:
+	write =0;
+	write =0;
+	jmp exit;	
+
+exit_1:
+	write =0;
+	write 1;
+	jmp exit;
+
+exit_2:
+	write =1;
+	write =0;
+	jmp exit;
+
+exit_3:
+	write 1;
+	write =0;
+	jmp exit;
+
+exit_4:
+	write 3;
+	write 1;
+	jmp exit;
+
+exit:
+	halt

@@ -1,0 +1,95 @@
+;simple sort
+<input> 7 7 7 7 7 7 7 7
+
+load =9;CONST offset(number of registers) reserved for helper variables
+store 9;store offset
+
+read 0;
+jz exit;
+
+store 8;elements count
+store 7;elements left
+load =1;
+add 9;
+store 5;first element index
+store 6;current element index
+
+load 8;
+add 5;
+store 4;last element index
+
+
+input_loop:
+	read 0;
+	store *6;
+	load 6;
+	add =1;
+	store 6;
+
+	load 4;
+	sub 6;
+	jgtz input_loop;
+	
+load 5;
+store 6;
+
+
+sort_outer_loop:
+	load 4;
+	sub 6;
+	jgtz outer_next;
+	jmp sort_end;
+	
+	outer_next:
+	load 6;
+	add =1;
+	store 3;inner loop index
+	
+	sort_inner_loop:
+		load 4;
+		sub 3;
+		jgtz continue_inner;
+		load 6;
+		add =1;
+		store 6;
+		jmp sort_outer_loop;
+		continue_inner:
+		load *6;
+		sub *3;
+				
+		jgtz swap
+		jmp inner_next
+
+		swap:
+			load *3;
+			store 2;
+			load *6;
+			store *3;
+			load 2;
+			store *6;
+		inner_next:
+			load 3;
+			add =1;
+			store 3;
+			jmp sort_inner_loop;
+		
+
+sort_end:
+load 8;
+store 7;
+
+load 5;
+store 6;
+
+output_loop:
+	write *6;
+	load 6;
+	add =1;
+	store 6;
+
+	load 4;
+	sub 6;
+	jgtz output_loop;
+
+exit:
+	halt;
