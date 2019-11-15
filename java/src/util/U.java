@@ -1,4 +1,4 @@
-package model;
+package util;
 
 public final class U {
     public static final <T> T[] increaseArray(final T[] array, final int increaseCapacityBy) {
@@ -58,5 +58,23 @@ public final class U {
 
     public static <T> void shiftItemsFromIndex(final T[] array, final int idx, final int size) {
 
+    }
+
+    public static long randomNumber(final long min, final long max) {
+        final long d = max - min + 1;
+        final long r = (long)Math.floor(Math.random() * d) + min;
+        return r;
+    }
+
+    public static int[] powersOf2(final long n) {
+        String digits = Long.toBinaryString(n);
+        final int[] res = new int[digits.length()];
+        for (int i = 0; i < digits.length(); i += 1) {
+            int j = digits.length() - i - 1;
+
+            res[i] = digits.charAt(j) == '1' ? 1 : 0;
+        }
+
+        return res;
     }
 }

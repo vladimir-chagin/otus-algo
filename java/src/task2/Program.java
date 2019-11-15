@@ -1,4 +1,6 @@
-import model.*;
+package task2;
+
+import task2.model.*;
 
 
 public class Program {

@@ -1,4 +1,4 @@
-package model;
+package task2.model;
 
 public class Node<T> {
     private Node next;

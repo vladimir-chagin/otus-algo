@@ -1,4 +1,4 @@
-package model;
+package task2.model;
 
 public class SortedArray<T extends IPrioritable> extends SingleArray<T> {
 

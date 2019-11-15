@@ -1,4 +1,4 @@
-package model;
+package task2.model;
 
 public class LinkedList<T> implements IArray<T> {
 

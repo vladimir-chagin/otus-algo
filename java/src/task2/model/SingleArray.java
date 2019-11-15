@@ -1,4 +1,6 @@
-package model;
+package task2.model;
+
+import util.U;
 
 public class SingleArray<T> extends AbstractArray<T> {
 

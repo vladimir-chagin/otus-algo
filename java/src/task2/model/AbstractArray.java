@@ -1,4 +1,4 @@
-package model;
+package task2.model;
 
 public abstract class AbstractArray<T> implements IArray<T> {
 

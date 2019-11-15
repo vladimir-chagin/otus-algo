@@ -1,4 +1,4 @@
-package model;
+package task2.model;
 
 public class ArrLstArray<T> implements IArray<T> {
     private java.util.ArrayList<T> array;

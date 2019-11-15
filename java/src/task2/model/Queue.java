@@ -1,4 +1,4 @@
-package model;
+package task2.model;
 
 public class Queue<T> {
     private IArray<T> list;
