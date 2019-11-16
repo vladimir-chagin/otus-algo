@@ -88,30 +88,40 @@ public class MatrixArray<T> extends AbstractArray<T> {
             throw new RuntimeException("Invalid index: " + index + "; size: " + size);
         }
 
-        final int vIndex = index / size;
+        final int vIndex = index / vector;
         final int hIndex = index % vector;
 
         final IArray<T> hArray = array.get(vIndex);
         final T removedItem = hArray.remove(hIndex);
 
-        if (vIndex < size - 1) {
-            for (int i = vIndex; i < size - 1; i += 1) {
+        if (vIndex < array.size() - 1) {
+            for (int i = vIndex; i < array.size() - 1; i += 1) {
                 final IArray<T> arr1 = array.get(i);
                 final IArray<T> arr2 = array.get(i + 1);
-
-                final T item = arr2.removeFirst();
-                arr1.add(item);
+                if (!arr2.isEmpty()) {
+                    final T item = arr2.removeFirst();
+                    arr1.add(item);
+                } else {
+                    array.remove(i + 1);
+                    break;
+                }
             }
         }
 
-        if (hArray.isEmpty()) {
-            array.removeLast();
-        }
-
+        size -= 1;
         return removedItem;
     }
 
     private final void addSubArray() {
         array.add(new VectorArray<T>(vector));
+    }
+
+    public void print() {
+        System.out.println("--------------------------");
+        for (int i = 0; i < array.size(); i += 1) {
+            IArray<T> arr = array.get(i);
+            ((AbstractArray)arr).print();
+        }
+
     }
 }

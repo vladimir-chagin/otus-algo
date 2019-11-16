@@ -10,7 +10,7 @@ public class Program {
 
         MatrixArray<String> arr = new MatrixArray<>();
         try {
-            for (int i = 0; i < 10; i += 1) {
+            for (int i = 0; i < 25; i += 1) {
                 arr.add(String.valueOf(i));
                 arr.print();
             }
