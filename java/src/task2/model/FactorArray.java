@@ -21,9 +21,10 @@ public class FactorArray<T> extends AbstractArray<T> {
 
     @Override
     public void add(T item) {
-        if (size() == array.length) {
-            array = U.increaseArray(array, size() * factor / 100);
+        if (size == array.length) {
+            array = U.increaseArray(array, size * factor / 100 + 1);
         }
+
         array[size] = item;
         size += 1;
     }
@@ -41,25 +42,30 @@ public class FactorArray<T> extends AbstractArray<T> {
         }
 
         if (size == array.length) {
-            final int increaseCapacityBy = array.length * factor / 100;
+            final int increaseCapacityBy = array.length * factor / 100 + 1;
             array = U.increaseArray(array, increaseCapacityBy, index);
         }
 
         array[index] = item;
+        size += 1;
     }
 
     @Override
     public T remove(int index) {
+
         if (index < 0 || index >= size()) {
-            throw new RuntimeException("Invalid index: " + index + "; size" + size());
+            throw new RuntimeException("Invalid index: " + index + "; size: " + size);
         }
 
         final T item = array[index];
 
-        if ((array.length - size) > size * factor / 100) {
-            array = U.reduceArray(array, array.length - size, index);
+        if ((array.length - size) > (size * factor / 100 + 1)) {
+            array = U.removeItemAndDecreaseCapacity(array, index, size);
+        } else {
+            U.removeItem(array, index, size);
         }
 
+        size -= 1;
         return item;
     }
 

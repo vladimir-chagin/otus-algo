@@ -6,9 +6,9 @@ import task3.impl.Fibonacci;
 import task3.impl.GCD;
 
 public class Program {
-    private static final long MIN_A = 1_000_000L;
+    private static final long MIN_A = 1_000L;
     private static final long MAX_A = MIN_A * 1_000_000;
-    private static final long MIN_B = 1_000_000_000L;
+    private static final long MIN_B = 1_000_000L;
     private static final long MAX_B = MIN_B * 1000_000;
 
     private static final int ITERATIONS = 1000000;
@@ -20,7 +20,7 @@ public class Program {
     public static void main(String[] args) {
         testGCD();
 
-//        testFibonacci(FIB_N);
+        testFibonacci(FIB_N);
     }
 
 

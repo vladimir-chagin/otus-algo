@@ -1,28 +1,50 @@
 package task2;
 
 import task2.model.*;
+import util.U;
 
 
 public class Program {
 
     public static void main(String[] args) {
 
-        IArray<String> singleArray = new SingleArray<>();
-        IArray<String> vectorArray = new FactorArray<>();
-        IArray<String> factorArray = new FactorArray<>();
-        IArray<String> matrixArray = new MatrixArray<>();
-        IArray<String> arrLstArray = new ArrLstArray<>();
-        IArray<String> sortedArray = new SortedArray();
-//        IArray<String> spacedArray = new SpaceArray<>();
+        MatrixArray<String> arr = new MatrixArray<>();
+        try {
+            for (int i = 0; i < 10; i += 1) {
+                arr.add(String.valueOf(i));
+                arr.print();
+            }
 
-        for (int i = 0; i < counts.length; i += 1) {
-            testArray(singleArray, counts[i]);
-            testArray(vectorArray, counts[i]);
-            testArray(factorArray, counts[i]);
-            testArray(matrixArray, counts[i]);
-            testArray(arrLstArray, counts[i]);
-            testArray(sortedArray, counts[i]);
+            for (int i = 0; i < arr.size();) {
+                int idx = (int)U.randomNumber(0, arr.size() - 1);
+                String el = arr.remove(idx);
+                System.out.print("Removed " + idx + "-th element; ");
+                arr.print();
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+            arr.print();
         }
+
+
+
+//        IArray<String> singleArray = new SingleArray<>();
+//        IArray<String> vectorArray = new FactorArray<>();
+//        IArray<String> factorArray = new FactorArray<>();
+//        IArray<String> matrixArray = new MatrixArray<>();
+//        IArray<String> arrLstArray = new ArrLstArray<>();
+//        IArray<String> sortedArray = new SortedArray();
+////        IArray<String> spacedArray = new SpaceArray<>();
+//
+//        for (int i = 0; i < counts.length; i += 1) {
+//            testArray(singleArray, counts[i]);
+//            testArray(vectorArray, counts[i]);
+//            testArray(factorArray, counts[i]);
+//            testArray(matrixArray, counts[i]);
+//            testArray(arrLstArray, counts[i]);
+//            testArray(sortedArray, counts[i]);
+//        }
 
     }
 

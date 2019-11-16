@@ -46,7 +46,7 @@ public class SingleArray<T> extends AbstractArray<T> {
 
         final T item = array[index];
 
-        array = U.reduceArray(array, 1, index);
+        array = U.removeItemAndDecreaseCapacity(array, index, array.length);
 
         return item;
     }

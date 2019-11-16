@@ -2,62 +2,67 @@ package util;
 
 public final class U {
     public static final <T> T[] increaseArray(final T[] array, final int increaseCapacityBy) {
-        return increaseArray(array, increaseCapacityBy, -1);
+        final T[] newArr = (T[]) new Object[array.length + increaseCapacityBy];
+
+        if (array.length > 0) {
+            System.arraycopy(array, 0, newArr, 0, array.length);
+        }
+
+        return newArr;
     }
 
     public static final <T> T[] increaseArray(final T[] array, final int increaseCapacityBy, final int emptyIdx) {
+        final T[] newArray = newArray(array.length + increaseCapacityBy);
 
-        if (emptyIdx > array.length) {
-            throw new ArrayIndexOutOfBoundsException("Out of bounds");
-        }
-
-        if (array.length <= 0) {
-            return (T[])new Object[1];
-        }
-
-        T[] newArray = increaseCapacityBy == 0 ? array
-                : (T[]) new Object[array.length + increaseCapacityBy];
-
-        if (emptyIdx < 0) {
-            System.arraycopy(array, 0, newArray, 0, array.length);
-        } else if (emptyIdx == 0) {
-            System.arraycopy(array, 0, newArray, 1, array.length);
-        } else if (emptyIdx == array.length) {
-            System.arraycopy(array, 0, newArray, 0, array.length);
-        } else {
-            System.arraycopy(array, 0, newArray, 0, emptyIdx);
-            System.arraycopy(array, emptyIdx, newArray, emptyIdx + 1, newArray.length - emptyIdx - increaseCapacityBy);
-        }
-
-        return newArray;
-    }
-
-    public static <T> T[] reduceArray(final T[] array, final int reduceBy, final int idx) {
-        if (array.length <= 0 || idx >= array.length || idx < 0) {
-            throw new IllegalStateException("Invalid params");
-        }
-
-        final int newLength = array.length >= reduceBy ? array.length - reduceBy : 0;
-
-        final T[] newArray = (T[]) new Object[newLength];
-        if (newLength == 0) {
-            return newArray;
-        }
-
-        if (idx == 0) {
-            System.arraycopy(array, 1, newArray, 0, newArray.length - 1);
-        } else if (idx == array.length - 1) {
-            System.arraycopy(array, 0, newArray, 0, newArray.length - 1);
-        } else {
-            System.arraycopy(array, 0, newArray, 0, idx);
-            System.arraycopy(array, idx + 1, newArray, idx, newArray.length - idx - 1);
+        if (newArray.length > 1) {
+            if (emptyIdx < newArray.length - 1) {
+                System.arraycopy(array, 0, newArray, 0, emptyIdx);
+                System.arraycopy(array, emptyIdx, newArray, emptyIdx + 1, array.length - emptyIdx - 1);
+            }
         }
 
         return newArray;
     }
 
     public static <T> void shiftItemsFromIndex(final T[] array, final int idx, final int size) {
+        if (size >= array.length) {
+            throw new RuntimeException("Not enough space");
+        }
 
+        if (idx >= size) {
+            throw new RuntimeException("Index: " + idx + " greater than size: " + size);
+        }
+
+        System.arraycopy(array, idx, array, idx + 1, size - idx - 1);
+    }
+
+    public static <T> T[] removeItemAndDecreaseCapacity(final T[] array, final int idx, final int size) {
+        final int newSize = size-1;
+        if (newSize <= 0) {
+            return newArray(0);
+        }
+
+        final T[] newArray = newArray(newSize);
+
+        if (idx == 0) {
+            System.arraycopy(array, 1, newArray, 0, newSize);
+        } else if (idx == newSize) {
+            System.arraycopy(array, 0, newArray, 0, idx);
+        } else {
+            System.arraycopy(array, 0, newArray, 0, idx);
+            System.arraycopy(array, idx + 1, newArray, idx, newSize - idx);
+        }
+
+        return newArray;
+    }
+
+    public static <T> void removeItem(final T[] array, final int idx, final int size) {
+        if (idx == array.length - 1) {
+            array[idx] = null;
+        } else {
+            System.arraycopy(array, idx + 1, array, idx, size - idx - 1);
+            array[size-1] = null;
+        }
     }
 
     public static long randomNumber(final long min, final long max) {
@@ -66,15 +71,8 @@ public final class U {
         return r;
     }
 
-    public static int[] powersOf2(final long n) {
-        String digits = Long.toBinaryString(n);
-        final int[] res = new int[digits.length()];
-        for (int i = 0; i < digits.length(); i += 1) {
-            int j = digits.length() - i - 1;
-
-            res[i] = digits.charAt(j) == '1' ? 1 : 0;
-        }
-
-        return res;
+    private static <T> T[] newArray(final int n) {
+        return (T[]) new Object[n];
     }
+
 }

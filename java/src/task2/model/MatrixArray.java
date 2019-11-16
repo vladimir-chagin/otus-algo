@@ -41,16 +41,20 @@ public class MatrixArray<T> extends AbstractArray<T> {
 
     @Override
     public void add(T item, int index) {
-        final int vIndex = index / size;
+        if (size == array.size() * vector) {
+            addSubArray();
+        }
+
+        if (index > size) {
+            throw new RuntimeException("Invalid index: " + index + "; size: " + size);
+        }
+
+        final int vIndex = index / vector;
         final int hIndex = index % vector;
 
         T tmpItem = item;
 
         for (int i = vIndex; i <= array.size(); i += 1) {
-            if (array.size() == i) {
-                addSubArray();
-            }
-
             IArray<T> hArr = array.get(i);
 
             if (hArr.size() < vector) {

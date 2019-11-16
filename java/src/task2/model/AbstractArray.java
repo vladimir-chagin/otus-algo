@@ -1,5 +1,7 @@
 package task2.model;
 
+import java.util.Arrays;
+
 public abstract class AbstractArray<T> implements IArray<T> {
 
     protected int size;
@@ -38,5 +40,9 @@ public abstract class AbstractArray<T> implements IArray<T> {
     @Override
     public String toString() {
         return getClass().getSimpleName();
+    }
+
+    public void print() {
+        System.out.println("L=" + array.length + "; S=" + size +"; " + Arrays.toString(array));
     }
 }
