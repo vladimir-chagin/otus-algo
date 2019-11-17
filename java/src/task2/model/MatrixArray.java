@@ -54,32 +54,31 @@ public class MatrixArray<T> extends AbstractArray<T> {
 
         T tmpItem = item;
 
-        for (int i = vIndex; i <= array.size(); i += 1) {
+        for (int i = vIndex; i < array.size(); i += 1) {
             IArray<T> hArr = array.get(i);
 
-            if (hArr.size() < vector) {
-                hArr.add(item, hIndex);
-                break;
+            if (i == vIndex) {
+                if (hArr.size() == vector) {
+                    T tmpItem2 = hArr.removeLast();
+                    hArr.add(tmpItem, hIndex);
+                    tmpItem = tmpItem2;
+                } else {
+                    hArr.add(item, hIndex);
+                    break;
+                }
             }
 
             if (hArr.size() == vector) {
                 T tmpItem2 = hArr.removeLast();
-
-                if (i == vIndex) {
-                    hArr.add(tmpItem, hIndex);
-                } else {
-                    hArr.addFirst(tmpItem);
-                }
+                hArr.addFirst(item);
                 tmpItem = tmpItem2;
-                continue;
+            } else {
+                hArr.addFirst(tmpItem);
+                break;
             }
-
-            hArr.addFirst(tmpItem);
-            break;
         }
 
         size += 1;
-        //TODO: move items to right
     }
 
     @Override

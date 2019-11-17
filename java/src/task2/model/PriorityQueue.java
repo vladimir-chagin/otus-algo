@@ -5,14 +5,19 @@ public class PriorityQueue<T> {
     private SortedArray<PriorityList<T>> array;
     private int size;
 
+    private PriorityList<T> tmpList = new PriorityList<>(0);
+
     public PriorityQueue() {
         array = new SortedArray<>();
         size = 0;
     }
 
     public void enqueue(int priority, T item) {
-        int idx = array.indexOf(priority);
-        final PriorityList<T> queue = idx < 0 ? new PriorityList<T>(priority) : array.get(idx);
+        tmpList.setPriority(priority);
+
+        int idx = array.indexOf(tmpList);
+
+        final PriorityList<T> queue = idx < 0 ? new PriorityList<>(priority) : array.get(idx);
         if (idx < 0) {
             array.add(queue, ~idx);
         }
@@ -35,5 +40,7 @@ public class PriorityQueue<T> {
         return item;
     }
 
-
+    public boolean isEmpty() {
+        return size <= 0;
+    }
 }

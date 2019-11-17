@@ -14,12 +14,6 @@ public class SingleArray<T> extends AbstractArray<T> {
     }
 
     @Override
-    public void add(T item) {
-        array = U.increaseArray(array, 1);
-        array[array.length - 1] = item;
-    }
-
-    @Override
     public T get(int index) {
         if (index < 0 || index >= size()) {
             throw new ArrayIndexOutOfBoundsException("Invalid index");
@@ -36,6 +30,7 @@ public class SingleArray<T> extends AbstractArray<T> {
 
         array = U.increaseArray(array, 1, index);
         array[index] = item;
+        size += 1;
     }
 
     @Override
@@ -47,6 +42,7 @@ public class SingleArray<T> extends AbstractArray<T> {
         final T item = array[index];
 
         array = U.removeItemAndDecreaseCapacity(array, index, array.length);
+        size -= 1;
 
         return item;
     }

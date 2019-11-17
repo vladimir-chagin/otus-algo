@@ -103,6 +103,7 @@ public class DoubleLinkedList<T> implements IArray<T> {
 
         node.setPrev(null);
         node.setNext(null);
+        size -= 1;
 
         return node.getItem();
     }
@@ -120,6 +121,11 @@ public class DoubleLinkedList<T> implements IArray<T> {
     @Override
     public boolean isEmpty() {
         return size == 0;
+    }
+
+    @Override
+    public int indexOf(T item) {
+        throw new RuntimeException("Not implemented");
     }
 
     private Node<T> getNode(final int index) {
@@ -153,5 +159,23 @@ public class DoubleLinkedList<T> implements IArray<T> {
         }
 
         throw new RuntimeException("Item not found");
+    }
+
+    public String toString() {
+        StringBuilder b = new StringBuilder();
+        b.append("S=").append(size);
+        b.append("[");
+        Node<T> n = head;
+        int cnt = 0;
+        while(n != null) {
+            b.append(n.getItem());
+            if (cnt < size - 1) {
+                b.append(", ");
+            }
+            n = n.getNext();
+            cnt += 1;
+        }
+        b.append("]");
+        return b.toString();
     }
 }

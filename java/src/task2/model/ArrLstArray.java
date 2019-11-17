@@ -48,12 +48,17 @@ public class ArrLstArray<T> implements IArray<T> {
     }
 
     @Override
+    public int indexOf(T item) {
+        return array.indexOf(item);
+    }
+
+    @Override
     public boolean isEmpty() {
         return array.size() <= 0;
     }
 
     @Override
     public String toString() {
-        return getClass().getName();
+        return getClass().getSimpleName();
     }
 }

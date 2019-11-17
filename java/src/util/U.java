@@ -14,10 +14,14 @@ public final class U {
     public static final <T> T[] increaseArray(final T[] array, final int increaseCapacityBy, final int emptyIdx) {
         final T[] newArray = newArray(array.length + increaseCapacityBy);
 
-        if (newArray.length > 1) {
-            if (emptyIdx < newArray.length - 1) {
+        if (array.length > 0) {
+            if (emptyIdx == 0) {
+                System.arraycopy(array, 0, newArray, 1, array.length);
+            } else if (emptyIdx == array.length) {
+                System.arraycopy(array, 0, newArray, 0, array.length);
+            } else {
                 System.arraycopy(array, 0, newArray, 0, emptyIdx);
-                System.arraycopy(array, emptyIdx, newArray, emptyIdx + 1, array.length - emptyIdx - 1);
+                System.arraycopy(array, emptyIdx, newArray, emptyIdx + 1, array.length - emptyIdx);
             }
         }
 
@@ -29,11 +33,11 @@ public final class U {
             throw new RuntimeException("Not enough space");
         }
 
-        if (idx >= size) {
+        if (idx > size) {
             throw new RuntimeException("Index: " + idx + " greater than size: " + size);
+        } else if (idx < size) {
+            System.arraycopy(array, idx, array, idx + 1, size - idx - 1);
         }
-
-        System.arraycopy(array, idx, array, idx + 1, size - idx - 1);
     }
 
     public static <T> T[] removeItemAndDecreaseCapacity(final T[] array, final int idx, final int size) {

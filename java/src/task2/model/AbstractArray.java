@@ -28,6 +28,11 @@ public abstract class AbstractArray<T> implements IArray<T> {
     }
 
     @Override
+    public void add(T item) {
+        add(item, size);
+    }
+
+    @Override
     public final T removeLast() {
         return remove(size() - 1);
     }
@@ -42,7 +47,18 @@ public abstract class AbstractArray<T> implements IArray<T> {
         return getClass().getSimpleName();
     }
 
+    @Override
+    public int indexOf(T item) {
+        for (int i = 0; i < size; i += 1) {
+            if (array[i] == item) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     public void print() {
-        System.out.println("L=" + array.length + "; S=" + size +"; " + Arrays.toString(array));
+        System.out.println(Arrays.toString(array) + "." + array.length + "." + size);
     }
 }

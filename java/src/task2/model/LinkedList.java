@@ -82,6 +82,11 @@ public class LinkedList<T> implements IArray<T> {
     }
 
     @Override
+    public int indexOf(T item) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
     public boolean isEmpty() {
         return head == null;
     }

@@ -25,6 +25,9 @@ public interface IArray<T> {
     //removes the very last item and returns is
     T removeLast();
 
+    //return index of item, or -insertionIndex in sorted array, otherwise -1
+    int indexOf(T item);
+
     //return true if no items, otherwise false
     boolean isEmpty();
 
