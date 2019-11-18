@@ -64,7 +64,7 @@ public class Program {
         final String output = b.toString();
         System.out.println(output);
         try {
-            Files.write(Paths.get("report.html"), output.getBytes());
+            Files.write(Paths.get("report_arrays.html"), output.getBytes());
         } catch(Exception e) {
             e.printStackTrace();
         }
