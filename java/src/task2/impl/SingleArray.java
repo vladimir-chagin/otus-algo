@@ -1,4 +1,4 @@
-package task2.model;
+package task2.impl;
 
 import util.U;
 

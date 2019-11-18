@@ -1,4 +1,4 @@
-package task2.model;
+package task2.impl;
 
 public class PriorityList<T> extends DoubleLinkedList<T> implements Comparable<PriorityList<T>> {
     private int priority;

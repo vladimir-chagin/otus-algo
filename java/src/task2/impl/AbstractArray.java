@@ -1,4 +1,6 @@
-package task2.model;
+package task2.impl;
+
+import util.U;
 
 import java.util.Arrays;
 
@@ -6,10 +8,10 @@ public abstract class AbstractArray<T> implements IArray<T> {
 
     protected int size;
     protected T[] array;
+    protected final int initialCapacity;
 
     AbstractArray(final int initialCapacity) {
-        size = 0;
-        array = (T[])new Object[initialCapacity];
+        clear(this.initialCapacity = initialCapacity);
     }
 
     @Override
@@ -56,6 +58,15 @@ public abstract class AbstractArray<T> implements IArray<T> {
         }
 
         return -1;
+    }
+
+    public void clear() {
+        clear(initialCapacity);
+    }
+
+    private void clear(int initialCapacity) {
+        size = 0;
+        array = U.newArray(initialCapacity);
     }
 
     public void print() {

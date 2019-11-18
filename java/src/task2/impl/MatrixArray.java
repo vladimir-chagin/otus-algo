@@ -1,4 +1,4 @@
-package task2.model;
+package task2.impl;
 
 public class MatrixArray<T> extends AbstractArray<T> {
     private static final int VECTOR = 10;

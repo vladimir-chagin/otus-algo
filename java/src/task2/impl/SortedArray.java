@@ -1,4 +1,4 @@
-package task2.model;
+package task2.impl;
 
 public class SortedArray<T extends Object & Comparable<T>> extends SingleArray<T> {
 

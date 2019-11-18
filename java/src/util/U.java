@@ -75,7 +75,7 @@ public final class U {
         return r;
     }
 
-    private static <T> T[] newArray(final int n) {
+    public static <T> T[] newArray(final int n) {
         return (T[]) new Object[n];
     }
 

@@ -1,4 +1,4 @@
-package task2.model;
+package task2.impl;
 
 public class SpaceArray<T> extends AbstractArray<T> {
 

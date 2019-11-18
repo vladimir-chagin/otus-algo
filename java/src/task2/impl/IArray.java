@@ -1,4 +1,4 @@
-package task2.model;
+package task2.impl;
 
 public interface IArray<T> {
     // returns size
@@ -28,6 +28,8 @@ public interface IArray<T> {
     //return index of item, or -insertionIndex in sorted array, otherwise -1
     int indexOf(T item);
 
+    //removes all elements from array
+    void clear();
     //return true if no items, otherwise false
     boolean isEmpty();
 

@@ -1,4 +1,4 @@
-package task2.model;
+package task2.impl;
 
 public class LinkedList<T> implements IArray<T> {
 
@@ -6,8 +6,7 @@ public class LinkedList<T> implements IArray<T> {
     private int size;
 
     public LinkedList() {
-        head = null;
-        size = 0;
+        clear();
     }
 
     @Override
@@ -30,7 +29,7 @@ public class LinkedList<T> implements IArray<T> {
             head = new Node<T>(item, head);
         } else {
             Node<T> prevNode = getNode(index - 1);
-            prevNode.setNext(new Node<T>(item, prevNode.getNext().getNext()));
+            prevNode.setNext(new Node<T>(item, prevNode.getNext()));
         }
 
         size += 1;
@@ -48,11 +47,14 @@ public class LinkedList<T> implements IArray<T> {
 
     @Override
     public T remove(int index) {
+        if (index >= size) {
+            throw new RuntimeException("Invalid index: " + index + "; size = " + size);
+        }
 
         if (index == 0) {
             Node<T> node = head;
             head = head.getNext();
-            size -=1;
+            size -= 1;
             return node.getItem();
         }
 
@@ -60,7 +62,10 @@ public class LinkedList<T> implements IArray<T> {
         Node<T> node = prevNode.getNext();
 
         prevNode.setNext(node.getNext());
-        size -=1;
+
+//        node.setNext(null);
+        size -= 1;
+
         return node.getItem();
     }
 
@@ -71,19 +76,37 @@ public class LinkedList<T> implements IArray<T> {
 
     @Override
     public T removeLast() {
-        Node<T> preLast = getNode(size - 1);
-        if (preLast != null) {
-            Node<T> last = preLast.getNext();
-            preLast.setNext(null);
-            return last.getItem();
+        if (size <= 0) {
+            throw new RuntimeException("List is empty");
         }
 
-        throw new RuntimeException("Invalid index");
+        Node<T> node;
+        if (size == 1) {
+            node = head;
+            head = null;
+        } else {
+            Node<T> preLast = getNode(size - 2);
+            Node<T> last = preLast.getNext();
+            preLast.setNext(null);
+            node = last;
+        }
+
+        size -= 1;
+        return node.getItem();
     }
 
     @Override
     public int indexOf(T item) {
-        throw new RuntimeException("Not implemented");
+        int cnt = 0;
+        Node<T> node = head;
+        while(node != null) {
+            if (node.getItem() == item) {
+                return cnt;
+            }
+            node = node.getNext();
+        }
+
+        return -1;
     }
 
     @Override
@@ -91,10 +114,21 @@ public class LinkedList<T> implements IArray<T> {
         return head == null;
     }
 
+    @Override
+    public void clear() {
+        head = null;
+        size = 0;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
+
     private Node<T> getNode(int index) {
         int cnt = 0;
         Node<T> node = head;
-        while(cnt < index && node.hasNext()) {
+        while(cnt < index) {
             node = node.getNext();
             cnt += 1;
         }
@@ -105,4 +139,6 @@ public class LinkedList<T> implements IArray<T> {
 
         throw new RuntimeException("Invalid index: " + index + "; size: " + size);
     }
+
+
 }

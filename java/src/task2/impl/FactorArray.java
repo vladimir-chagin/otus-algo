@@ -1,17 +1,17 @@
-package task2.model;
+package task2.impl;
 
 import util.U;
 
-public class VectorArray<T> extends AbstractArray<T> {
-    private final int vector;
+public class FactorArray<T> extends AbstractArray<T> {
+    private final int factor;
 
-    public VectorArray(int vector) {
-        super(0);
-        this.vector = vector;
+    public FactorArray(int factor, int initLength) {
+        super(initLength);
+        this.factor = factor;
     }
 
-    public VectorArray() {
-        this(10);
+    public FactorArray() {
+        this(50, 10);
     }
 
     @Override
@@ -21,8 +21,8 @@ public class VectorArray<T> extends AbstractArray<T> {
 
     @Override
     public void add(T item) {
-        if (size() == array.length) {
-            array = U.increaseArray(array, vector);
+        if (size == array.length) {
+            array = U.increaseArray(array, size * factor / 100 + 1);
         }
 
         array[size] = item;
@@ -37,28 +37,29 @@ public class VectorArray<T> extends AbstractArray<T> {
 
     @Override
     public void add(T item, int index) {
-        if (index < 0 || index > size) {
-            throw new RuntimeException("Invalid add index");
+        if (index < 0 || index > array.length) {
+            throw new RuntimeException("Invalid index: " + index + "; size: " + size());
         }
 
-        if (array.length == size) {
-            array = U.increaseArray(array, vector, index);
-        } else {
-            U.shiftItemsFromIndex(array, index, size);
+        if (size == array.length) {
+            final int increaseCapacityBy = array.length * factor / 100 + 1;
+            array = U.increaseArray(array, increaseCapacityBy, index);
         }
+
         array[index] = item;
         size += 1;
     }
 
     @Override
     public T remove(int index) {
+
         if (index < 0 || index >= size()) {
             throw new RuntimeException("Invalid index: " + index + "; size: " + size);
         }
 
         final T item = array[index];
 
-        if (array.length - size + 1 >= vector && array.length > vector) {
+        if ((array.length - size) > (size * factor / 100 + 1)) {
             array = U.removeItemAndDecreaseCapacity(array, index, size);
         } else {
             U.removeItem(array, index, size);

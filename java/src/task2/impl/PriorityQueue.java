@@ -1,4 +1,4 @@
-package task2.model;
+package task2.impl;
 
 public class PriorityQueue<T> {
 
@@ -42,5 +42,12 @@ public class PriorityQueue<T> {
 
     public boolean isEmpty() {
         return size <= 0;
+    }
+
+    public void clear() {
+        for (int i = 0; i < array.size(); i += 1) {
+            array.get(i).clear();
+        }
+        array.clear();
     }
 }

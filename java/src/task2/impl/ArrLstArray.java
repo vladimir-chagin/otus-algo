@@ -1,4 +1,4 @@
-package task2.model;
+package task2.impl;
 
 public class ArrLstArray<T> implements IArray<T> {
     private java.util.ArrayList<T> array;
@@ -50,6 +50,11 @@ public class ArrLstArray<T> implements IArray<T> {
     @Override
     public int indexOf(T item) {
         return array.indexOf(item);
+    }
+
+    @Override
+    public void clear() {
+        array.clear();
     }
 
     @Override
