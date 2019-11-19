@@ -9,10 +9,11 @@ import java.nio.file.Paths;
 
 
 public class Program {
+    private static final int[] counts = new int[]{ 100, 1_000, 10_000, 20_000, 50_000, 100_000 };
 
     public static void main(String[] args) {
         IArray<String> singleArray = new SingleArray<>();
-        IArray<String> vectorArray = new FactorArray<>();
+        IArray<String> vectorArray = new VectorArray<>();
         IArray<String> factorArray = new FactorArray<>();
         IArray<String> matrixArray = new MatrixArray<>();
         IArray<String> arrLstArray = new ArrLstArray<>();
@@ -21,68 +22,57 @@ public class Program {
         IArray<String> doubleLinkedList = new DoubleLinkedList<>();
 
         StringBuilder b = new StringBuilder();
-        b.append("<table border=\"1\">");
-        b.append("<tr>");
-        b.append("<th>Name</th>");
-        b.append("<th>Add</th>");
-        b.append("<th>Add(i)</th>");
-        b.append("<th>Add(0)</th>");
-        b.append("<th>Get(i)</th>");
-        b.append("<th>Remove(i)</th>");
-        b.append("<th>Remove(0)</th>");
-        b.append("<th>Remove(n)</th>");
-        b.append("</tr>");
+
+        b.append("# Arrays");
+        b.append("\r\n");
+
+        b.append("Name|Add|Add(i)|Add(0)|Get(i)|Remove(i)|Remove(n)|Remove(0)\r\n");
+        b.append("---|---|---|---|---|---|---|---\r\n");
         for (int i = 0; i < counts.length; i += 1) {
-            b.append("<tr><td>" + "Testing with " + counts[i] + " iterations" + "</td></tr>");
-
-            b.append(testArray(singleArray, counts[i]));
-            b.append(testArray(vectorArray, counts[i]));
-            b.append(testArray(factorArray, counts[i]));
-            b.append(testArray(arrLstArray, counts[i]));
-            b.append(testArray(sortedArray, counts[i]));
-            b.append(testArray(matrixArray, counts[i]));
-            b.append(testArray(linkedList, counts[i]));
-            b.append(testArray(doubleLinkedList, counts[i]));
-
-            b.append("\r\n");
+            b.append("**" + counts[i] + " iterations** | \r\n");
+            System.out.println("Iterations: " + counts[i]);
+            b.append(testArray(singleArray, counts[i])).append("\r\n");
+            b.append(testArray(vectorArray, counts[i])).append("\r\n");
+            b.append(testArray(factorArray, counts[i])).append("\r\n");
+            b.append(testArray(arrLstArray, counts[i])).append("\r\n");
+            b.append(testArray(sortedArray, counts[i])).append("\r\n");
+            b.append(testArray(matrixArray, counts[i])).append("\r\n");
+            b.append(testArray(linkedList, counts[i])).append("\r\n");
+            b.append(testArray(doubleLinkedList, counts[i])).append("\r\n");
         }
-        b.append("</table>\r\n");
 
-        b.append("<table border=\"1\">");
+        b.append("\r\n");
+
+        b.append("# PriorityQueue\r\n");
         PriorityQueue<String> queue = new PriorityQueue<>();
-        b.append("<tr><td>Enqueue</td><td>Dequeue</td></tr>");
+        b.append("|---|Enqueue|Dequeue|\r\n");
+        b.append("|---|---|---|\r\n");
         for (int i = 0; i < counts.length; i += 1) {
-            b.append("<tr><td>" + "Testing with " + counts[i] + " iterations</td></tr>");
-            b.append("<tr><td>");
-            b.append(testEnqueue(queue, counts[i]));
-            b.append("</td><td>");
-            b.append(testDequeue(queue, counts[i]));
-            b.append("</td></tr>");
+            b.append(counts[i] + " iterations|");
+            b.append(testEnqueue(queue, counts[i])).append("|").append(testDequeue(queue, counts[i])).append("|\r\n");
         }
-        b.append("</table>\r\n");
+        b.append("\r\n");
 
         final String output = b.toString();
         System.out.println(output);
         try {
-            Files.write(Paths.get("report_arrays.html"), output.getBytes());
+            Files.write(Paths.get("java", "src", "task2", "report_generated.md"), output.getBytes());
         } catch(Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    private static final int[] counts = new int[]{ 100, 1_000, 10_000, 100_000 };
-
     private static String testArray(IArray<String> array, int count) {
-        String row = "<tr>" +
-                "<td>" + array + "</td>" +
-                "<td>" + testArrayAdd(array, count) + "</td>" +
-                "<td>" + testArrayAddWithIndex(array, count) + "</td>" +
-                "<td>" + testArrayAddFirst(array, count) + "</td>" +
-                "<td>" + testArrayGet(array, count) + "</td>" +
-                "<td>" + testArrayRemove(array, count) + "</td>" +
-                "<td>" + testArrayRemoveLast(array, count) + "</td>" +
-                "<td>" + testArrayRemoveFirst(array, count) + "</td></tr>";
+        String row =
+                array + "|" +
+                testArrayAdd(array, count) + "|" +
+                testArrayAddWithIndex(array, count) + "|" +
+                testArrayAddFirst(array, count) + "|" +
+                testArrayGet(array, count) + "|" +
+                testArrayRemove(array, count) + "|" +
+                testArrayRemoveLast(array, count) + "|" +
+                testArrayRemoveFirst(array, count);
 
 //        System.out.println(row);
 

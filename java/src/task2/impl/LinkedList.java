@@ -16,7 +16,7 @@ public class LinkedList<T> implements IArray<T> {
 
     @Override
     public void add(T item) {
-        add(item, 0);
+        add(item, size);
     }
 
     @Override
