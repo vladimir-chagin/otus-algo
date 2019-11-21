@@ -112,7 +112,7 @@ public class Program {
 
         return Performance.measure("", () -> {
             for (int i = 0; i < count; i += 1) {
-                int idx = (int)U.randomNumber(0, array.size() - 1);
+                int idx = (int)U.randomLong(0, array.size() - 1);
                 array.remove(idx);
             }
         });
@@ -158,7 +158,7 @@ public class Program {
     }
 
     private static int randomIndex(final IArray<String> array) {
-        int idx = (int)U.randomNumber(0, array.size());
+        int idx = (int)U.randomLong(0, array.size());
         if (idx > array.size()) {
             idx = array.size();
         }
@@ -168,7 +168,7 @@ public class Program {
     private static String testEnqueue(final PriorityQueue<String> queue, final int count) {
         return Performance.measure("", () -> {
             for (int i = 0; i < count; i += 1) {
-                int p = (int)U.randomNumber(1, count);
+                int p = (int)U.randomLong(1, count);
                 queue.enqueue(p, String.valueOf(i));
             }
         });

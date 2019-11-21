@@ -69,14 +69,49 @@ public final class U {
         }
     }
 
-    public static long randomNumber(final long min, final long max) {
+    public static long randomLong(final long min, final long max) {
         final long d = max - min + 1;
         final long r = (long)Math.floor(Math.random() * d) + min;
         return r;
+    }
+
+    public static int randomInt(final long min, final long max) {
+        return (int)randomLong(min, max);
     }
 
     public static <T> T[] newArray(final int n) {
         return (T[]) new Object[n];
     }
 
+    //mix - if mix is zero array will be sorted, if mix is 0.5 - array will be half sorted
+    //if mix < 0 sorted items will be at the end
+    public static void fillArrayWithRandomNumbers(Integer[] array) {
+        for (int i = 0; i < array.length; i += 1) {
+            array[i] = Integer.valueOf(i);
+        }
+    }
+
+    public static<T> void swap(T[] array, int i, int j) {
+        T tmp = array[i];
+        array[i] = array[j];
+        array[j] = tmp;
+    }
+
+    public static<T> void shuffleArray(T[] array, double mix) {
+        final int sign = (int)Math.signum(mix);
+        final int cnt = (int)(array.length * mix * sign);
+
+        if (sign == 0 || cnt == 0) {
+            return;
+        }
+        for (int i = 0; i < cnt-1; i += 1) {
+            int j = randomInt(i + 1, cnt-1);
+            int k = i;
+            if (sign < 0) {
+                k = array.length - i -1;
+                j = array.length - j - 1;
+            }
+            swap(array, j, k);
+        }
+    }
 }

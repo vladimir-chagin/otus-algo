@@ -42,8 +42,8 @@ public class Program {
 
     private static void testSubGCD() {
         for (int i = 0; i < ITERATIONS; i += 1) {
-            final long a = U.randomNumber(MIN_A, MAX_A);
-            final long b = U.randomNumber(MIN_B, MAX_B);
+            final long a = U.randomLong(MIN_A, MAX_A);
+            final long b = U.randomLong(MIN_B, MAX_B);
 
             final long subGcd = GCD.euclidSub(a, b);
         }
@@ -51,8 +51,8 @@ public class Program {
 
     private static void testModGCD() {
         for (int i = 0; i < ITERATIONS; i += 1) {
-            final long a = U.randomNumber(MIN_A, MAX_A);
-            final long b = U.randomNumber(MIN_B, MAX_B);
+            final long a = U.randomLong(MIN_A, MAX_A);
+            final long b = U.randomLong(MIN_B, MAX_B);
 
             final long modGcd = GCD.euclidMod(a, b);
         }
@@ -60,8 +60,8 @@ public class Program {
 
     private static void testBinGCD() {
         for (int i = 0; i < ITERATIONS; i += 1) {
-            final long a = U.randomNumber(MIN_A, MAX_A);
-            final long b = U.randomNumber(MIN_B, MAX_B);
+            final long a = U.randomLong(MIN_A, MAX_A);
+            final long b = U.randomLong(MIN_B, MAX_B);
 
             final long binGcd = GCD.binaryGcd(a, b);
         }
