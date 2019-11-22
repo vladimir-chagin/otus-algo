@@ -65,9 +65,37 @@ public class Program {
         }
     }
 
+    public static void testSameArray() {
+        Integer[] array = createArray(count, 1);
+        for (int i = 0; i < 10; i += 1) {
+            final Integer[] arr = new Integer[array.length];
+            System.arraycopy(array, 0, arr, 0, array.length);
+            final long duration = Performance.measure(() -> {
+                Sort.shell(arr);
+            });
+            System.out.println(duration);
+        }
+    }
+
+    private static void testSameArray1() {
+        final int[][] gaps = new int[][]{ Sort.Knuth, Sort.Hibbard, Sort.Papernov, Sort.Sedgewick };
+        final Integer[] array = createArray(count, 1);
+        for (int i = 0; i < gaps.length; i += 1) {
+            final Integer[] arr = new Integer[array.length];
+            System.arraycopy(array, 0, arr, 0, array.length);
+            final int[] g = gaps[i];
+            final long duration = Performance.measure(() -> {
+                Sort.shell(arr, g);
+            });
+            System.out.println(duration);
+        }
+
+    }
 
     public static void main(String[] args) {
-        testSort();
+//        testSort();
+        testSameArray1();
     }
+
 
 }
