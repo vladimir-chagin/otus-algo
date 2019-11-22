@@ -1,5 +1,7 @@
 package util;
 
+import java.util.Arrays;
+
 public final class U {
     public static final <T> T[] increaseArray(final T[] array, final int increaseCapacityBy) {
         final T[] newArr = (T[]) new Object[array.length + increaseCapacityBy];
@@ -113,5 +115,9 @@ public final class U {
             }
             swap(array, j, k);
         }
+    }
+
+    public static<T> String arrayToString(T[] array) {
+        return "[" + array.length + "]: " + Arrays.toString(array);
     }
 }
