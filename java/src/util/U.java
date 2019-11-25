@@ -120,4 +120,36 @@ public final class U {
     public static<T> String arrayToString(T[] array) {
         return "[" + array.length + "]: " + Arrays.toString(array);
     }
+
+    public static boolean compareStrings(String s1, String s2) {
+        if (s1 == s2) {
+            return true;
+        }
+
+        if (s1 == null || s2 == null) {
+            return false;
+        }
+
+        return s1.equals(s2);
+    }
+
+    public static void assertEquals(String[] data1, String[] data2) {
+        if (data2 == data1) {
+            return;
+        }
+
+        if (data1 == null || data2 == null) {
+            throw new RuntimeException("Null output data");
+        }
+
+        if (data1.length != data2.length) {
+            throw new RuntimeException("Different lengths");
+        }
+
+        for (int i = 0; i < data2.length; i += 1) {
+            if (!U.compareStrings(data1[i], data2[i])) {
+                throw new RuntimeException("line[" + i + "]" + data1[i] + " != " + data2[i]);
+            }
+        }
+    }
 }
