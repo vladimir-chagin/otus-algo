@@ -152,4 +152,12 @@ public final class U {
             }
         }
     }
+
+    public static void printArray(int[] array) {
+        System.out.println(Arrays.toString(array));
+    }
+
+    public static void printArray(Object[] array) {
+        System.out.println(Arrays.toString(array));
+    }
 }

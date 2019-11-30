@@ -1,0 +1,9 @@
+algorithm|duration
+:---|---:
+merge|76224ms
+merge(32)|70252ms
+merge(64)|86308ms
+merge(128)|75875ms
+merge(256)|71364ms
+merge(512)|70236ms
+merge(1024)|72204ms

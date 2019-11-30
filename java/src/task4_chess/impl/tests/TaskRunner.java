@@ -1,9 +1,5 @@
 package task4_chess.impl.tests;
 
-import javafx.concurrent.Task;
-import jdk.nashorn.internal.runtime.regexp.joni.Regex;
-import util.IO;
-
 import java.lang.reflect.Constructor;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
