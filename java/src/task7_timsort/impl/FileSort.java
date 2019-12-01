@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileAttribute;
 
 public class FileSort {
     private static final String FILENAME = "java/src/task7_timsort/data/numbers.bin";
@@ -22,7 +21,7 @@ public class FileSort {
     private static final int BUFFER_SIZE = 1024 * 1024;
     private static final byte[] BYTE_BUFFER = new byte[BUFFER_SIZE];
     private static final int[] INT_BUFFER = new int[BUFFER_SIZE >> 1];
-    private static final int MAX_NUMBERS = Integer.MAX_VALUE >> 1;
+    private static final int MAX_NUMBERS = Integer.MAX_VALUE >> 2;
 
     private static final int MIN_VALUE = 0;
     private static final int MAX_VALUE = 65535;
@@ -31,11 +30,10 @@ public class FileSort {
         final Path filePath = Paths.get(FILENAME);
         try {
             if (Files.exists(filePath)) {
-                Files.delete(filePath);
+                return;
             }
 
             Files.createFile(filePath);
-
             OutputStream out = Files.newOutputStream(filePath, StandardOpenOption.APPEND);
             int numbersCount = 0;
             while(numbersCount < MAX_NUMBERS) {
@@ -46,6 +44,7 @@ public class FileSort {
                 numbersCount += byteLength / 2;
             }
             out.flush();
+            out.close();
         } catch(Throwable t) {
             t.printStackTrace();
         }
@@ -97,7 +96,17 @@ public class FileSort {
         return intCount;
     }
 
-    public static void sortFile() {
+    public static void sortFileWithMerge() {
+        doSort(MergeSort::sort);
+    }
+
+    public static void sortFileWithMixedMerge(final int minPart) {
+        doSort((final int[] array, final int l, final int h) -> {
+            MergeSort.sortMixed(array, l, h, minPart);
+        });
+    }
+
+    private static void doSort(Sorter fn) {
         final IArray<String> sortedParts = new VectorArray<>(1024);
 
         try {
@@ -106,7 +115,9 @@ public class FileSort {
             int iterCount = 0;
             while((readCount = in.read(BYTE_BUFFER)) > 0) {
                 byteToInt(BYTE_BUFFER, INT_BUFFER);
-                MergeSort.sort(INT_BUFFER, 0, (readCount + 1) / 2 - 1);
+
+                fn.sort(INT_BUFFER, 0, (readCount + 1) / 2 - 1);
+
                 int byteCount = intToByte(INT_BUFFER, BYTE_BUFFER);
                 final String fileName = TMP_FILENAME_PREFIX + "/" + iterCount + ".bin";
                 saveArrayToFile(BYTE_BUFFER, byteCount, fileName);
@@ -114,13 +125,15 @@ public class FileSort {
                 iterCount += 1;
             }
 
-            mergeFiles(sortedParts, 0);
+            final IArray<String> filesToRemove = new FactorArray<>(50, 2048);
+            mergeFiles(sortedParts, filesToRemove, 0);
+            removeFiles(filesToRemove);
         } catch(Throwable t) {
             t.printStackTrace();
         }
     }
 
-    private static IArray<String> mergeFiles(IArray<String> fileNames, int mergeRound) {
+    private static IArray<String> mergeFiles(IArray<String> fileNames, IArray<String> filesToRemove, int mergeRound) {
         IArray<String> mergedFiles = new FactorArray<>();
         try {
             int cnt = 0;
@@ -136,11 +149,19 @@ public class FileSort {
                 final String mergedFileName = TMP_FILENAME_PREFIX + "/" + mergeRound + "_" + cnt + ".bin";
                 final Path mergedFilePath = Paths.get(mergedFileName);
                 final OutputStream out = Files.newOutputStream(mergedFilePath);
+                try {
+                    merge(in1, in2, out);
+                } finally {
+                    out.close();
+                    in1.close();
+                    in2.close();
+                }
 
-                merge(in1, in2, out);
                 mergedFiles.add(mergedFileName);
-
                 cnt += 1;
+
+                filesToRemove.add(fn1);
+                filesToRemove.add(fn2);
             }
 
             if (fileNames.size() > 0) {
@@ -148,57 +169,14 @@ public class FileSort {
             }
 
             if (mergedFiles.size() > 1) {
-                mergeFiles(mergedFiles, mergeRound + 1);
+                mergeFiles(mergedFiles, filesToRemove,mergeRound + 1);
             } else {
                 System.out.println("Sorted file: " + mergedFiles.get(0));
             }
-
         } catch(Throwable t) {
             t.printStackTrace();
         }
         return mergedFiles;
-    }
-
-    private static void merge(final int[] arr1, final int l1, final int[] arr2, final int l2, byte[] buffer, OutputStream out) {
-        try {
-            int i1 = 0;
-            int i2 = 0;
-            int byteCount = 0;
-
-            while(i1 < l1 || i2 < l2) {
-                int n;
-                if (i1 < l1 && i2 < l2) {
-                    if (arr1[i1] <= arr2[i2]) {
-                        n = arr1[i1++];
-                    } else {
-                        n = arr2[i2++];
-                    }
-                } else if (i1 < l1) {
-                    n = arr1[i1++];
-                } else {
-                    n = arr2[i2++];
-                }
-
-                final byte high = (byte)((n >> 8) & 0xff);
-                final byte low = (byte)(n & 0xff);
-                buffer[byteCount++] = high;
-                buffer[byteCount++] = low;
-
-                if (byteCount == buffer.length - 1) {
-                    out.write(buffer);
-                    byteCount = 0;
-                }
-            }
-
-            if (byteCount > 0) {
-                out.write(buffer, 0, byteCount);
-            }
-
-            out.flush();
-
-        } catch(Throwable t) {
-            t.printStackTrace();
-        }
     }
 
     private static void merge(final InputStream in1, final InputStream in2, final OutputStream out) {
@@ -293,7 +271,19 @@ public class FileSort {
         }
     }
 
-    public static void clearFiles() {
+    public static void removeFiles(IArray<String> files) {
+        for (int i = 0; i < files.size(); i += 1) {
+            removeFile(files.get(i));
+        }
+    }
+
+    private static void removeFile(final String filename) {
+        try {
+            final Path p = Paths.get(filename);
+            Files.deleteIfExists(p);
+        } catch(Throwable t) {
+            t.printStackTrace();
+        }
 
     }
 

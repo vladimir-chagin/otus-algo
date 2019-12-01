@@ -42,7 +42,7 @@ public class Program {
         FileSort.generateFileWithRandomNumbers();
 
         final long duration = Performance.measure(() -> {
-            FileSort.sortFile();
+            FileSort.sortFileWithMerge();
         });
 
         s.append("merge(" + part + ")").append("|").append(duration + "ms");

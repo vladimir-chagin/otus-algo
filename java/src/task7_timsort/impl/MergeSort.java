@@ -9,10 +9,10 @@ public class MergeSort {
     public static final int[] MIN_PARTS = new int[] { 32/*, 64, 128, 256, 512, 1024*/ };
 
     public static void sortMixed(final int[] array, final int minPart) {
-        mergeSortMixed(array, 0, array.length-1, minPart);
+        sortMixed(array, 0, array.length-1, minPart);
     }
 
-    private static void mergeSortMixed(final int[] array, final int l, final int h, final int minPart) {
+    public static void sortMixed(final int[] array, final int l, final int h, final int minPart) {
         if (l >= h) {
             return;
         }
