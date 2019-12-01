@@ -1,5 +1,6 @@
 package task7_timsort.impl;
 
+import task2.impl.FactorArray;
 import task2.impl.IArray;
 import task2.impl.VectorArray;
 import util.U;
@@ -10,10 +11,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
 
-public class ArrayGenerator {
-    private static final String FILENAME = "java/src/task7_timsort/numbers.bin";
-    private static final String TMP_FILENAME_PREFIX = "java/src/task7_timsort/tmp_numbers";
+public class FileSort {
+    private static final String FILENAME = "java/src/task7_timsort/data/numbers.bin";
+    private static final String TMP_FILENAME_PREFIX = "java/src/task7_timsort/data/tmp";
 
     private static final Path FILEPATH = Paths.get(FILENAME);
 
@@ -33,6 +35,7 @@ public class ArrayGenerator {
             }
 
             Files.createFile(filePath);
+
             OutputStream out = Files.newOutputStream(filePath, StandardOpenOption.APPEND);
             int numbersCount = 0;
             while(numbersCount < MAX_NUMBERS) {
@@ -42,6 +45,7 @@ public class ArrayGenerator {
                 out.write(BYTE_BUFFER, 0, byteLength);
                 numbersCount += byteLength / 2;
             }
+            out.flush();
         } catch(Throwable t) {
             t.printStackTrace();
         }
@@ -56,27 +60,10 @@ public class ArrayGenerator {
 
         return length;
     }
-
-    public static int[] readNumbersFromFile(final int offset) {
-
-        try {
-            final Path filePath = Paths.get(FILENAME);
-
-            final byte[] allBytes = Files.readAllBytes(filePath);
-            final int[] result = new int[allBytes.length / 2];
-            intToByte(allBytes, result);
-            return result;
-        } catch(Throwable t) {
-            t.printStackTrace();
-        }
-
-        return new int[0];
-    }
-
     //dst.length >= src.length * 2
     //returns bytes count copied to dest
     private static int byteToInt(byte [] src, int[] dst) {
-        if (src.length > dst.length / 2) {
+        if (src.length / 2 > dst.length) {
             throw new RuntimeException("Not enough space in dst");
         }
 
@@ -93,7 +80,7 @@ public class ArrayGenerator {
     }
 
     private static int intToByte(int[] src, byte[] dst) {
-        if (src.length / 2 > dst.length) {
+        if (src.length > dst.length / 2) {
             throw new RuntimeException("Not enough space in destination");
         }
 
@@ -110,27 +97,6 @@ public class ArrayGenerator {
         return intCount;
     }
 
-    public static void saveArrayToFile(int[] array) {
-        final Path filePath = Paths.get(FILENAME);
-        try {
-            if (!Files.exists(filePath)) {
-                throw new RuntimeException("File doesn't exist");
-            }
-
-            OutputStream out = Files.newOutputStream(filePath, StandardOpenOption.WRITE);
-
-            final int numsCount = BUFFER_SIZE / 2;
-            int numIdx = 0;
-            while(numIdx < numsCount) {
-                int bytesCopied = byteToInt(array, BYTE_BUFFER, numIdx);
-                out.write(BYTE_BUFFER, 0, bytesCopied);
-                numIdx = bytesCopied / 2;
-            }
-        } catch(Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
     public static void sortFile() {
         final IArray<String> sortedParts = new VectorArray<>(1024);
 
@@ -140,20 +106,57 @@ public class ArrayGenerator {
             int iterCount = 0;
             while((readCount = in.read(BYTE_BUFFER)) > 0) {
                 byteToInt(BYTE_BUFFER, INT_BUFFER);
-                MergeSort.sort(INT_BUFFER, 0, readCount - 1);
+                MergeSort.sort(INT_BUFFER, 0, (readCount + 1) / 2 - 1);
                 int byteCount = intToByte(INT_BUFFER, BYTE_BUFFER);
-                final String fileName = TMP_FILENAME_PREFIX + "." + iterCount + ".bin";
+                final String fileName = TMP_FILENAME_PREFIX + "/" + iterCount + ".bin";
                 saveArrayToFile(BYTE_BUFFER, byteCount, fileName);
                 sortedParts.add(fileName);
                 iterCount += 1;
             }
+
+            mergeFiles(sortedParts, 0);
         } catch(Throwable t) {
             t.printStackTrace();
         }
+    }
 
-        while(sortedParts.size() > 0) {
+    private static IArray<String> mergeFiles(IArray<String> fileNames, int mergeRound) {
+        IArray<String> mergedFiles = new FactorArray<>();
+        try {
+            int cnt = 0;
+            while(fileNames.size() > 1) {
+                String fn1 = fileNames.removeLast();
+                String fn2 = fileNames.removeLast();
 
+                Path p1 = Paths.get(fn1);
+                Path p2 = Paths.get(fn2);
+
+                final InputStream in1 = Files.newInputStream(p1);
+                final InputStream in2 = Files.newInputStream(p2);
+                final String mergedFileName = TMP_FILENAME_PREFIX + "/" + mergeRound + "_" + cnt + ".bin";
+                final Path mergedFilePath = Paths.get(mergedFileName);
+                final OutputStream out = Files.newOutputStream(mergedFilePath);
+
+                merge(in1, in2, out);
+                mergedFiles.add(mergedFileName);
+
+                cnt += 1;
+            }
+
+            if (fileNames.size() > 0) {
+                mergedFiles.add(fileNames.removeLast());
+            }
+
+            if (mergedFiles.size() > 1) {
+                mergeFiles(mergedFiles, mergeRound + 1);
+            } else {
+                System.out.println("Sorted file: " + mergedFiles.get(0));
+            }
+
+        } catch(Throwable t) {
+            t.printStackTrace();
         }
+        return mergedFiles;
     }
 
     private static void merge(final int[] arr1, final int l1, final int[] arr2, final int l2, byte[] buffer, OutputStream out) {
@@ -198,7 +201,7 @@ public class ArrayGenerator {
         }
     }
 
-    private static void merge(final InputStream in1, final InputStream in2, final byte[] buffer, final OutputStream out) {
+    private static void merge(final InputStream in1, final InputStream in2, final OutputStream out) {
         try {
             final byte[] b1 = new byte[2];
             final byte[] b2 = new byte[2];
@@ -272,6 +275,8 @@ public class ArrayGenerator {
                     out.write(nBuff, 0, 1);
                 }
             }
+
+            out.flush();
         } catch(Throwable t) {
             t.printStackTrace();
         }
@@ -288,7 +293,7 @@ public class ArrayGenerator {
         }
     }
 
-    private static void sortChunk(int [] chunk) {
+    public static void clearFiles() {
 
     }
 

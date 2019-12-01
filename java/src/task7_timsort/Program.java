@@ -1,10 +1,8 @@
 package task7_timsort;
 
-import task7_timsort.impl.ArrayGenerator;
+import task7_timsort.impl.FileSort;
 import task7_timsort.impl.MergeSort;
-import task7_timsort.impl.QuickSort;
 import util.Performance;
-import util.U;
 
 public class Program {
     /*
@@ -23,6 +21,10 @@ public class Program {
     +2 байта за таблицу и вывод
     * */
     public static void main(String[] args) {
+//        final int[] array = new int[] { 1, 3, 0, 2, 0, 2, 3, 4, 5, 0};
+//        U.printArray(array);
+//        MergeSort.sort(array);
+//        U.printArray(array);
         final StringBuilder report = new StringBuilder();
         report.append("algorithm|duration").append("\r\n");
 
@@ -37,18 +39,11 @@ public class Program {
     }
 
     private static void testSortFile(StringBuilder s, final int part) {
-        ArrayGenerator.generateFileWithRandomNumbers();
-        final int [] nums = ArrayGenerator.readNumbersFromFile();
+        FileSort.generateFileWithRandomNumbers();
 
         final long duration = Performance.measure(() -> {
-            if (part <= 0) {
-                MergeSort.sort(nums);
-            } else {
-                MergeSort.sortMixed(nums, part);
-            }
+            FileSort.sortFile();
         });
-
-        ArrayGenerator.saveArrayToFile(nums);
 
         s.append("merge(" + part + ")").append("|").append(duration + "ms");
     }
