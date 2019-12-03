@@ -91,6 +91,18 @@ public final class IntU {
         array[j] = tmp;
     }
 
+    public static int indexOfMax(int[] array) {
+        int maxIdx = 0;
+
+        for (int i = 1; i < array.length; i += 1) {
+            if (array[i] > array[maxIdx]) {
+                maxIdx = i;
+            }
+        }
+
+        return maxIdx;
+    }
+
     public static void shuffleArray(int[] array, double mix) {
         final int sign = (int)Math.signum(mix);
         final int cnt = (int)(array.length * mix * sign);
@@ -106,6 +118,12 @@ public final class IntU {
                 j = array.length - j - 1;
             }
             swap(array, j, k);
+        }
+    }
+
+    public static void fillArrayWithRandomNumbers(final int[] array, int min, int max) {
+        for (int i = 0; i < array.length; i += 1) {
+            array[i] = randomInt(min, max);
         }
     }
 

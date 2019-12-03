@@ -1,7 +1,8 @@
 package task8_radixsort;
 
-import task2.impl.primitive.IntSortedArray;
+import task8_radixsort.impl.RadixSort;
 import util.IntU;
+import util.U;
 
 public class Program {
     /*
@@ -23,6 +24,10 @@ public class Program {
     +5 байт сравнительный анализ, заполненная таблица и вывод.
     * */
     public static void main(String[] args) {
-
+        final int[] array = new int[100];
+        IntU.fillArrayWithRandomNumbers(array, 0, Short.MAX_VALUE << 2 - 1);
+        U.printArray(array);
+        RadixSort.sort(array);
+        U.printArray(array);
     }
 }

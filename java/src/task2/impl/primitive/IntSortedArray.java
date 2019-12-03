@@ -45,6 +45,14 @@ public class IntSortedArray {
         size += 1;
     }
 
+    public int get(int i) {
+        if (i < 0 || i >= size) {
+            throw new RuntimeException("Invalid index: " + i + "; size: " + size);
+        }
+
+        return array[i];
+    }
+
     public int indexOf(int value) {
         if (size <= 0) {
             return ~0;
