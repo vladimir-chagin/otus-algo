@@ -6,8 +6,6 @@ import util.U;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /*
 * 1. Выбрать подходящий размер массива, чтобы алгоритм работал 5-20 секунд.
@@ -27,7 +25,7 @@ public class Program {
 
     private static Integer[] createArray(int len, double mix) {
         Integer[] array = new Integer[len];
-        U.fillArrayWithRandomNumbers(array);
+        U.fillArrayWithRandomIntegers(array);
         U.shuffleArray(array, mix);
         return array;
     }

@@ -30,7 +30,7 @@ public class Program {
 
     private static Integer[] createArray(int len, double mix) {
         Integer[] array = new Integer[len];
-        U.fillArrayWithRandomNumbers(array);
+        U.fillArrayWithRandomIntegers(array);
         U.shuffleArray(array, mix);
         return array;
     }

@@ -1,5 +1,6 @@
 package task7_timsort;
 
+import task7_timsort.impl.BufferedFileSort;
 import task7_timsort.impl.FileSort;
 import task7_timsort.impl.MergeSort;
 import util.Performance;
@@ -21,30 +22,34 @@ public class Program {
     +2 байта за таблицу и вывод
     * */
     public static void main(String[] args) {
-//        final int[] array = new int[] { 1, 3, 0, 2, 0, 2, 3, 4, 5, 0};
-//        U.printArray(array);
-//        MergeSort.sort(array);
-//        U.printArray(array);
-        final StringBuilder report = new StringBuilder();
-        report.append("algorithm|duration").append("\r\n");
+//        final StringBuilder report = new StringBuilder();
+//        report.append("algorithm|duration").append("\r\n");
+//
+//        testSortFile(report, 0);
+//        report.append("\r\n");
+//        for(int i = 0; i < MergeSort.MIN_PARTS.length; i += 1) {
+//            testSortFile(report, MergeSort.MIN_PARTS[i]);
+//            report.append("\r\n");
+//        }
+//
+//        System.out.println(report.toString());
 
-        testSortFile(report, 0);
-        report.append("\r\n");
-        for(int i = 0; i < MergeSort.MIN_PARTS.length; i += 1) {
-            testSortFile(report, MergeSort.MIN_PARTS[i]);
-            report.append("\r\n");
-        }
-
-        System.out.println(report.toString());
+        testFileMergeSort();
     }
 
     private static void testSortFile(StringBuilder s, final int part) {
-        FileSort.generateFileWithRandomNumbers();
+        BufferedFileSort.generateFileWithRandomNumbers();
 
-        final long duration = Performance.measure(() -> {
-            FileSort.sortFileWithMerge();
-        });
+
+        final long duration = part == 0
+                ? Performance.measure(() -> { BufferedFileSort.sortFileWithMerge(); })
+                : Performance.measure(() -> { BufferedFileSort.sortFileWithMixedMerge(part); });
 
         s.append("merge(" + part + ")").append("|").append(duration + "ms");
+    }
+
+    private static void testFileMergeSort() {
+        FileSort.generateFileWithRandomNumbers("numbers.bin", FileSort.NUMBERS_IN_FILE, FileSort.MIN_VALUE, FileSort.MAX_VALUE);
+        FileSort.sort();
     }
 }

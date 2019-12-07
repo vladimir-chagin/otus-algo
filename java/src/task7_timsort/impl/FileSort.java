@@ -1,310 +1,178 @@
 package task7_timsort.impl;
 
-import task2.impl.FactorArray;
-import task2.impl.IArray;
-import task2.impl.VectorArray;
-import util.Performance;
-import util.U;
+import util.IntU;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 public class FileSort {
-    private static final String FILENAME = "java/src/task7_timsort/data/numbers.bin";
-    private static final String TMP_FILENAME_PREFIX = "java/src/task7_timsort/data/tmp";
 
-    private static final int BUFFER_SIZE = 1024 * 1024;
-    private static final byte[] BYTE_BUFFER = new byte[BUFFER_SIZE];
-    private static final int[] INT_BUFFER = new int[BUFFER_SIZE >> 1];
-    private static final int MAX_NUMBERS = Integer.MAX_VALUE >> 1;
+    private static final String DATA_DIR = "java/src/task7_timsort/data/";
+    private static final String ORIGINAL_FILE = DATA_DIR + "numbers.bin";
+    private static final String DATA_DIR_TMP = DATA_DIR + "tmp/";
+    private static final String DATA_DIR_SORTED = DATA_DIR + "sorted/";
 
-    private static final int MIN_VALUE = 0;
-    private static final int MAX_VALUE = 65535;
+    public static final long NUMBERS_IN_FILE = Integer.MAX_VALUE >> 4 - 1;
+    public static final int MIN_VALUE = 0;
+    public static final int MAX_VALUE = Short.MAX_VALUE << 1 - 1;
 
-    public static void generateFileWithRandomNumbers() {
-        final Path filePath = Paths.get(FILENAME);
+    private static final ByteBuffer BYTE_BUFFER = ByteBuffer.allocate(2);
+    private static final int[] MERGE_BUFFER = new int[1024];
+    private static final int[] INT_BUFFER = new int[1];
+
+    private static final byte[] FILE_BYTE_BUFFER = new byte[MERGE_BUFFER.length << 1];
+
+
+    public static void sort() {
         try {
-            if (Files.exists(filePath)) {
-                return;
-            }
-
-            Files.createFile(filePath);
-            OutputStream out = Files.newOutputStream(filePath, StandardOpenOption.APPEND);
-            int numbersCount = 0;
-            while(numbersCount < MAX_NUMBERS) {
-                int intCount = MAX_NUMBERS - numbersCount > INT_BUFFER.length ? INT_BUFFER.length : MAX_NUMBERS - numbersCount;
-                fillArrayWithRandomNumbers(INT_BUFFER, intCount);
-                final int byteLength = intToByte(INT_BUFFER, BYTE_BUFFER);
-                out.write(BYTE_BUFFER, 0, byteLength);
-                numbersCount += byteLength / 2;
-            }
-            out.flush();
-            out.close();
+            final Path p = Paths.get(ORIGINAL_FILE);
+            final FileChannel ch = FileChannel.open(p, StandardOpenOption.READ);
+            final long numberInFile = (ch.size() + 1) >> 1;
+            final String mergedFile = mergeSort(ch, 0, numberInFile - 1);
+            System.out.println(mergedFile);
         } catch(Throwable t) {
             t.printStackTrace();
         }
     }
 
-    public static int fillArrayWithRandomNumbers(final int[] array, int length) {
-        length = Math.min(array.length, length);
-
-        for (int i = 0; i < length; i += 1) {
-            array[i] = 0xffff & U.randomInt(MIN_VALUE, MAX_VALUE);
+    private static String mergeSort(final SeekableByteChannel ch, final long l, final long h) throws IOException {
+        if (l >= h) {
+            return null;
         }
 
-        return length;
+        final long m = l + (h - l) / 2;
+        mergeSort(ch, l, m);
+        mergeSort(ch, m + 1, h);
+        return merge(ch, l, m, h);
     }
 
-    private static int byteToInt(byte [] src, int[] dst) {
-        return byteToInt(src, src.length, dst);
-    }
-
-    private static int byteToInt(byte [] src, int byteSize, int[] dst) {
-        if (byteSize / 2 > dst.length) {
-            throw new RuntimeException("Not enough space in dst");
+    private static String merge(final SeekableByteChannel ch, final long l, final long m, final long h) throws IOException {
+        if (l >= h) {
+            return null;
         }
 
-        int intCount = 0;
-        int byteCount = 0;
+        final String mergeFilename = DATA_DIR_TMP + "merged_" + l + "_" + m + "_" + h + ".bin";
+        Path p = Paths.get(mergeFilename);
+        Files.createFile(p);
+        try(final OutputStream out = Files.newOutputStream(p)) {
+            long li = l;
+            long ri = m + 1;
 
-        while(byteCount < byteSize) {
-            final int low = src[byteCount++];
-            final int high = src[byteCount++] << 8;
-            dst[intCount++] = 0xffff & (high | low);
-        }
+            int mergeIdx = 0;
+            while(li <= m || ri <= h) {
+                if (li <= m && ri <= h) {
+                    readInt(ch, li, INT_BUFFER);
+                    final int n1 = INT_BUFFER[0];
+                    readInt(ch, ri, INT_BUFFER);
+                    final int n2 = INT_BUFFER[0];
 
-        return intCount;
-    }
-
-    private static int intToByte(int[] src, byte[] dst) {
-        return intToByte(src, 0, src.length, dst);
-    }
-
-    private static int intToByte(int[] src, int offset, int length, byte[] dst) {
-        if (src.length <= offset) {
-            throw new RuntimeException("invalid offset: " + offset + "; length: " + src.length);
-        }
-
-        if (length > dst.length / 2) {
-            throw new RuntimeException("Not enough space in destination");
-        }
-
-        int intsToCopy = Math.min(src.length - offset, length);
-        int byteCount = 0;
-        int intCount = 0;
-
-        while(intCount < intsToCopy) {
-            byte high = (byte)(0xff & (src[offset + intCount] >> 8));
-            byte low = (byte)(0xff & src[offset + intCount]);
-            intCount += 1;
-
-            dst[byteCount++] = high;
-            dst[byteCount++] = low;
-        }
-
-        return byteCount;
-    }
-
-    private static int[] byteToInt(final byte[] bytes, final int size) {
-        if (bytes.length > size) {
-            throw new RuntimeException("Invalid size");
-        }
-
-        int[] nums = new int[size >> 1];
-
-        byteToInt(bytes, size, nums);
-
-        return nums;
-    }
-
-    public static void sortFileWithMerge() {
-        doSort(MergeSort::sort);
-    }
-
-    public static void sortFileWithMixedMerge(final int minPart) {
-        doSort((final int[] array, final int l, final int h) -> {
-            MergeSort.sortMixed(array, l, h, minPart);
-        });
-    }
-
-    private static void doSort(Sorter fn) {
-        final IArray<String> sortedParts = new VectorArray<>(1024);
-
-        try {
-            InputStream in = new FileInputStream(FILENAME);
-            int readCount;
-            int iterCount = 0;
-            while((readCount = in.read(BYTE_BUFFER)) > 0) {
-                int intCount = byteToInt(BYTE_BUFFER, readCount, INT_BUFFER);
-
-                fn.sort(INT_BUFFER, 0, intCount - 1);
-
-                int byteCount = intToByte(INT_BUFFER, 0, intCount, BYTE_BUFFER);
-
-                final String fileName = TMP_FILENAME_PREFIX + "/" + iterCount + ".bin";
-                saveArrayToFile(BYTE_BUFFER, byteCount, fileName);
-                sortedParts.add(fileName);
-                iterCount += 1;
-            }
-
-            System.out.println(sortedParts);
-
-            final IArray<String> filesToRemove = new FactorArray<>(50, 2048);
-
-            final String sortedFile = mergeFiles(sortedParts, filesToRemove, 0);
-            System.out.println(sortedFile);
-//            filesToRemove.add(sortedFile);
-            removeFiles(filesToRemove);
-        } catch(Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    private static String mergeFiles(IArray<String> fileNames, IArray<String> filesToRemove, int mergeRound) {
-        IArray<String> mergedFiles = new FactorArray<>();
-        try {
-            int cnt = 0;
-            while(fileNames.size() > 1) {
-                String fn1 = fileNames.removeLast();
-                String fn2 = fileNames.removeLast();
-
-                Path p1 = Paths.get(fn1);
-                Path p2 = Paths.get(fn2);
-
-                final InputStream in1 = Files.newInputStream(p1);
-                final InputStream in2 = Files.newInputStream(p2);
-
-                final String mergedFileName = TMP_FILENAME_PREFIX + "/" + mergeRound + "_" + cnt + ".bin";
-                final Path mergedFilePath = Paths.get(mergedFileName);
-                final OutputStream out = Files.newOutputStream(mergedFilePath);
-                try {
-                    merge(in1, in2, out);
-                } finally {
-                    out.close();
-                    in1.close();
-                    in2.close();
-                }
-
-                mergedFiles.add(mergedFileName);
-                cnt += 1;
-
-                filesToRemove.add(fn1);
-                filesToRemove.add(fn2);
-            }
-
-            if (fileNames.size() > 0) {
-                mergedFiles.add(fileNames.removeLast());
-            }
-
-            if (mergedFiles.size() > 1) {
-                return mergeFiles(mergedFiles, filesToRemove,mergeRound + 1);
-            } else {
-                return mergedFiles.get(0);
-            }
-        } catch(Throwable t) {
-            t.printStackTrace();
-        }
-
-        return null;
-    }
-
-    private static void merge(final InputStream in1, final InputStream in2, final OutputStream out) {
-        try {
-            final byte[] bytes1 = in1.readAllBytes();
-            final byte[] bytes2 = in2.readAllBytes();
-
-            final int[] nums1 = byteToInt(bytes1, bytes1.length);
-            final int[] nums2 = byteToInt(bytes2, bytes2.length);
-
-            int i1 = 0;
-            int i2 = 0;
-            int mergeCnt = 0;
-            final int[] mergeBuffer = INT_BUFFER;
-
-            while(i1 < nums1.length || i2 < nums2.length) {
-                if (i1 < nums1.length && i2 < nums2.length) {
-                    if (nums1[i1] <= nums2[i2]) {
-                        mergeBuffer[mergeCnt++] = nums1[i1++];
+                    if (n1 <= n2) {
+                        MERGE_BUFFER[mergeIdx++] = n1;
+                        li += 1;
                     } else {
-                        mergeBuffer[mergeCnt++] = nums2[i2++];
+                        MERGE_BUFFER[mergeIdx++] = n2;
+                        ri += 1;
                     }
-                } else if (i1 < nums1.length) {
-                    mergeBuffer[mergeCnt++] = nums1[i1++];
-                } else if (i2 < nums2.length) {
-                    mergeBuffer[mergeCnt++] = nums2[i2++];
+                } else if (li <= m) {
+                    readInt(ch, li++, INT_BUFFER);
+                    MERGE_BUFFER[mergeIdx++] = INT_BUFFER[0];
+                } else if (ri <= h) {
+                    readInt(ch, ri++, INT_BUFFER);
+                    MERGE_BUFFER[mergeIdx++] = INT_BUFFER[0];
                 }
 
-                if (mergeCnt >= mergeBuffer.length) {
-                    writeInts(mergeBuffer, mergeCnt, out);
-                    mergeCnt = 0;
+                if (mergeIdx >= MERGE_BUFFER.length) {
+                    bufferToFile(MERGE_BUFFER, mergeIdx, out);
+                    mergeIdx = 0;
                 }
             }
 
-            if (mergeCnt > 0) {
-                writeInts(mergeBuffer, mergeCnt, out);
+            if (mergeIdx > 0) {
+                bufferToFile(MERGE_BUFFER, mergeIdx, out);
             }
-
             out.flush();
-            out.close();
-        } catch(Throwable t) {
-            t.printStackTrace();
+        }
+
+        return mergeFilename;
+    }
+
+    private static void bufferToFile(final int[] buffer, final int size, final OutputStream out) throws IOException {
+        int length = Math.min(buffer.length, size);
+        int idx = 0;
+        int byteIdx = 0;
+        while(idx < length) {
+            final byte high = (byte)(0xff & (buffer[idx] >> 8));
+            final byte low = (byte)(0xff & buffer[idx] >> 8);
+            FILE_BYTE_BUFFER[byteIdx++] = high;
+            FILE_BYTE_BUFFER[byteIdx++] = low;
+            idx += 1;
+        }
+
+        if (byteIdx > 0) {
+            out.write(FILE_BYTE_BUFFER, 0, byteIdx);
         }
     }
 
-    private static void writeInts(final int[] intBuffer, final int size, final OutputStream out) throws Throwable {
-        int numsLeft = size;
-        int offset = 0;
-        while(numsLeft > 0) {
-            int bytesLength = Math.min(numsLeft << 1, BYTE_BUFFER.length);
+    private static int readInt(final SeekableByteChannel ch, final long i, final int[] res) throws IOException {
+        ch.position(i << 1);
 
-            intToByte(intBuffer, offset, size, BYTE_BUFFER);
-
-            out.write(BYTE_BUFFER, 0, bytesLength);
-
-            offset += bytesLength << 1;
-            numsLeft -= bytesLength >> 1;
-        }
-    }
-
-    private static int readInts(final int[] buffer, final InputStream in) throws Throwable {
-        int readBytesCnt = in.read(BYTE_BUFFER);
-        if (readBytesCnt > 0) {
-            return byteToInt(BYTE_BUFFER, buffer);
+        int bytes = ch.read(BYTE_BUFFER);
+        if (bytes <= 0) {
+            throw new RuntimeException("Invalid read position: " + i + "; size: " + ch.size());
         }
 
-        return -1;
+        byte high = BYTE_BUFFER.get(0);
+        res[0] = high;
+        if (bytes > 1) {
+            res[0] = 0xffff & ((high << 8) | BYTE_BUFFER.get(1));
+        }
+        BYTE_BUFFER.clear();
+        return bytes;
     }
 
-    private static void saveArrayToFile(byte[] buffer, int length, String fileName) {
+    public static final void generateFileWithRandomNumbers(final String filename, final long numbersInFile, final int min, final int max) {
+        final Path p = Paths.get(DATA_DIR + filename);
+        if (Files.exists(p)) {
+            return;
+        }
+
         try {
-            final Path path = Paths.get(fileName);
-            final OutputStream out = Files.newOutputStream(path, StandardOpenOption.CREATE);
-            out.write(buffer, 0, length);
-            out.flush();
-        } catch(Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    public static void removeFiles(IArray<String> files) {
-        for (int i = 0; i < files.size(); i += 1) {
-            removeFile(files.get(i));
-        }
-    }
-
-    private static void removeFile(final String filename) {
-        try {
-            final Path p = Paths.get(filename);
-            Files.deleteIfExists(p);
+            Files.createFile(p);
         } catch(Throwable t) {
             t.printStackTrace();
         }
 
+
+        try(final OutputStream out = Files.newOutputStream(p, StandardOpenOption.CREATE, StandardOpenOption.APPEND);) {
+            final byte[] buffer = FILE_BYTE_BUFFER;
+            int idx = 0;
+            long numbersLeft = numbersInFile;
+            while(numbersLeft-- > 0) {
+                final int number = IntU.randomInt(min, max);
+                final byte high = (byte)(0xff & (number >> 8));
+                final byte low = (byte)(0xff * number);
+                buffer[idx++] = high;
+                buffer[idx++] = low;
+                if (idx >= buffer.length) {
+                    out.write(buffer);
+                    idx = 0;
+                }
+            }
+            if (idx > 0) {
+                out.write(buffer, 0, idx);
+            }
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
 }

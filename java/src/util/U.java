@@ -87,9 +87,33 @@ public final class U {
 
     //mix - if mix is zero array will be sorted, if mix is 0.5 - array will be half sorted
     //if mix < 0 sorted items will be at the end
-    public static void fillArrayWithRandomNumbers(Integer[] array) {
+    public static void fillArrayWithRandomIntegers(Integer[] array) {
         for (int i = 0; i < array.length; i += 1) {
             array[i] = Integer.valueOf(i);
+        }
+    }
+
+    public static void fillArrayWithRandomLongs(final long[] array, final int offset, final int length, final long min, final long max) {
+        if (offset < 0 || offset >= array.length) {
+            throw new RuntimeException("Invalid offset: " + offset + "; [" + array.length + "]");
+        }
+
+        final int lastIdx = Math.min(array.length - offset, length) + offset - 1;
+
+        for (int i = offset; i <= lastIdx; i += 1) {
+            array[i] = U.randomLong(min, max);
+        }
+    }
+
+    public static void fillArrayWithRandomInts(final int[] array, final int offset, final int length, final int min, final int max) {
+        if (offset < 0 || offset >= array.length) {
+            throw new RuntimeException("Invalid offset: " + offset + "; [" + array.length + "]");
+        }
+
+        final int lastIdx = Math.min(array.length - offset, length) + offset - 1;
+
+        for (int i = offset; i <= lastIdx; i += 1) {
+            array[i] = U.randomInt(min, max);
         }
     }
 

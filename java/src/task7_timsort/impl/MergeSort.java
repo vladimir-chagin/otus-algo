@@ -6,7 +6,7 @@ public class MergeSort {
         sort(array, 0, array.length - 1);
     }
 
-    public static final int[] MIN_PARTS = new int[] { 32/*, 64, 128, 256, 512, 1024*/ };
+    public static final int[] MIN_PARTS = new int[] { 32, 64, 128, 256, 512, 1024 };
 
     public static void sortMixed(final int[] array, final int minPart) {
         sortMixed(array, 0, array.length-1, minPart);
