@@ -21,12 +21,18 @@ public class BinarySearchTree extends Tree {
 
     @Override
     public boolean search(int key) {
-        return searchNodeRecursive(rootNode, key) != null;
+//        return searchNodeRecursive(rootNode, key) != null;
+        return searchNodeIterative(key) != null;
     }
 
     @Override
     public boolean remove(int key) {
-        TreeNode node = searchNodeRecursive(rootNode, key);
+//        TreeNode node = searchNodeRecursive(rootNode, key);
+        return remove(rootNode, key);
+    }
+
+    private boolean remove(final TreeNode root, final int key) {
+        TreeNode node = searchNodeIterative(root, key);
         if (node == null) {
             return false;
         }
@@ -50,16 +56,22 @@ public class BinarySearchTree extends Tree {
 
         } else if (!node.hasLeftChild() || !node.hasRightChild()) { //node has only one child
             TreeNode childNode = node.hasLeftChild() ? node.getLeftChild() : node.getRightChild();
-            replaceChildNode(parentNode, node, childNode);
+
+            childNode.setParentNode(parentNode);
+
+            if (parentNode != null && parentNode.getLeftChild() == node) {
+                parentNode.setLeftChild(childNode);
+            } else if (parentNode != null && parentNode.getRightChild() == node) {
+                parentNode.setRightChild(childNode);
+            } else if (parentNode == null) {
+                rootNode = childNode;
+            } else {
+                throw new RuntimeException("This should never happen");
+            }
         } else {    //node has both left and right children
             final TreeNode newNode = findMinKeyNode(node.getRightChild());
-            newNode.detach();
-            newNode.setLeftChild(node.getLeftChild());
-            newNode.setRightChild(node.getRightChild());
-
-            replaceChildNode(parentNode, node, newNode);
-
-            node.reset();
+            node.setKey(newNode.getKey());
+            remove(node.getRightChild(), key);
         }
 
         size -= 1;
@@ -75,7 +87,11 @@ public class BinarySearchTree extends Tree {
     }
 
     private TreeNode searchNodeIterative(final int key) {
-        TreeNode node = rootNode;
+        return searchNodeIterative(rootNode, key);
+    }
+
+    private TreeNode searchNodeIterative(final TreeNode root, final int key) {
+        TreeNode node = root;
 
         while(node != null) {
             if (key == node.getKey()) {
@@ -101,17 +117,7 @@ public class BinarySearchTree extends Tree {
     }
 
     private void replaceChildNode(final TreeNode parentNode, final TreeNode oldNode, final TreeNode newNode) {
-        newNode.setParentNode(parentNode);
 
-        if (parentNode != null && parentNode.getLeftChild() == oldNode) {
-            parentNode.setLeftChild(newNode);
-        } else if (parentNode != null && parentNode.getRightChild() == oldNode) {
-            parentNode.setRightChild(newNode);
-        } else if (parentNode == null) {
-            rootNode = newNode;
-        } else {
-            throw new RuntimeException("This should never happen");
-        }
     }
 
     public TreeNode findMinKeyNode(TreeNode node) {

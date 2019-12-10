@@ -71,13 +71,14 @@ public class TreeNode {
         return parentNode == null;
     }
 
-    public void detach() {
+    public boolean detach() {
         if (!isLeaf()) {
-            throw new RuntimeException("Couldn't detach node with children");
+            return false;
+//            throw new RuntimeException("Couldn't detach node with children");
         }
 
         if (isRoot()) {
-            return;
+            return true;
         }
 
         if (parentNode.getLeftChild() == this) {
@@ -87,6 +88,7 @@ public class TreeNode {
         }
 
         parentNode = null;
+        return true;
     }
 
     public void reset() {
