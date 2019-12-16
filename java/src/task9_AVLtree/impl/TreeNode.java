@@ -7,6 +7,9 @@ public class TreeNode {
 
     private int key;
 
+    private int height;
+
+
     public TreeNode(int key) {
         this(null, null, key);
     }
@@ -20,6 +23,7 @@ public class TreeNode {
         this.leftChild = leftChild;
         this.rightChild = rightChild;
         this.key = key;
+        this.height = -1;
     }
 
 
@@ -29,6 +33,10 @@ public class TreeNode {
 
     public void setLeftChild(TreeNode node) {
         leftChild = node;
+        if (node != null) {
+            node.setParentNode(this);
+        }
+        height = -1;
     }
 
     public boolean hasLeftChild() {
@@ -41,6 +49,10 @@ public class TreeNode {
 
     public void setRightChild(TreeNode node) {
         rightChild = node;
+        if (node != null) {
+            node.setParentNode(this);
+        }
+        height = -1;
     }
 
     public boolean hasRightChild() {
@@ -63,6 +75,18 @@ public class TreeNode {
         parentNode = node;
     }
 
+    public boolean hasParentNode() {
+        return this.parentNode != null;
+    }
+
+    public boolean isLeftChildOf(final TreeNode parent) {
+        return parent != null && parent.getLeftChild() == this;
+    }
+
+    public boolean isRightChildOf(final TreeNode parent) {
+        return parent != null && parent.getRightChild() == this;
+    }
+
     public boolean isLeaf() {
         return !hasLeftChild() && !hasRightChild();
     }
@@ -71,30 +95,41 @@ public class TreeNode {
         return parentNode == null;
     }
 
-    public boolean detach() {
-        if (!isLeaf()) {
-            return false;
-//            throw new RuntimeException("Couldn't detach node with children");
+    public void reset() {
+        if (parentNode != null) {
+            if (parentNode.getLeftChild() == this) {
+                parentNode.setLeftChild(null);
+            } else if (parentNode.getRightChild() == this) {
+                parentNode.setRightChild(null);
+            }
+            parentNode = null;
         }
-
-        if (isRoot()) {
-            return true;
+        if (leftChild != null) {
+            leftChild.setParentNode(null);
+            leftChild = null;
         }
-
-        if (parentNode.getLeftChild() == this) {
-            parentNode.setLeftChild(null);
-        } else if (parentNode.getRightChild() == this) {
-            parentNode.setRightChild(null);
+        if (rightChild != null) {
+            rightChild.setParentNode(null);
+            rightChild = null;
         }
-
-        parentNode = null;
-        return true;
+        key = 0;
     }
 
-    public void reset() {
-        parentNode = null;
-        leftChild = null;
-        rightChild = null;
-        key = 0;
+    public int getHeight() {
+        if (height < 0) {
+            height = calcHeight(this);
+        }
+        return height;
+    }
+
+    private static int calcHeight(TreeNode node) {
+        if (node == null || node.isLeaf()) {
+            return 0;
+        }
+
+        final int lh = calcHeight(node.getLeftChild());
+        final int rh = calcHeight(node.getRightChild());
+
+        return Math.max(lh, rh) + 1;
     }
 }

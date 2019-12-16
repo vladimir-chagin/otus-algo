@@ -1,22 +1,27 @@
 package task9_AVLtree.impl;
 
-public class BinarySearchTree extends Tree {
+public class BinarySearchTree extends AbstractTree {
 
     @Override
     public void insert(int key) {
-        if (rootNode == null) {
-            rootNode = new TreeNode(key);
-        } else {
-            TreeNode currentParent = searchParentIterative(key);
-            final TreeNode newNode = new TreeNode(currentParent, null, null, key);
+        insert(new TreeNode(key));
+    }
 
-            if (key <= currentParent.getKey()) {
+    public TreeNode insert(final TreeNode newNode) {
+        if (rootNode == null) {
+            rootNode = newNode;
+        } else {
+            TreeNode currentParent = searchParentToInsert(newNode.getKey());
+
+            if (newNode.getKey() <= currentParent.getKey()) {
                 currentParent.setLeftChild(newNode);
             } else {
                 currentParent.setRightChild(newNode);
             }
         }
+
         size += 1;
+        return newNode;
     }
 
     @Override
@@ -26,56 +31,55 @@ public class BinarySearchTree extends Tree {
     }
 
     @Override
-    public boolean remove(int key) {
-//        TreeNode node = searchNodeRecursive(rootNode, key);
-        return remove(rootNode, key);
+    public void remove(int key) {
+        final TreeNode node = remove(rootNode, key);
+        balance(node);
     }
 
-    private boolean remove(final TreeNode root, final int key) {
+    protected final TreeNode remove(final TreeNode root, final int key) {
         TreeNode node = searchNodeIterative(root, key);
+
         if (node == null) {
-            return false;
+            return null;
         }
 
         TreeNode parentNode = node.getParentNode();
-
+        TreeNode nodeToStartRebalance;
         if (node.isLeaf()) {//isLeaf
-            if (parentNode != null) {
-                if (node == parentNode.getLeftChild()) {
-                    parentNode.setLeftChild(null);
-                } else if (node == parentNode.getRightChild()) {
-                    parentNode.setRightChild(null);
-                } else {
-                    throw new RuntimeException("This shouldn never happen");
-                }
-            } else {
+            if (parentNode != null && node.isLeftChildOf(parentNode)) {
+                parentNode.setLeftChild(null);
+            } else if (parentNode != null && node.isRightChildOf(parentNode)) {
+                parentNode.setRightChild(null);
+            } else if (parentNode == null) {
                 rootNode = null;
             }
-
             node.reset();
-
+            nodeToStartRebalance = parentNode;
         } else if (!node.hasLeftChild() || !node.hasRightChild()) { //node has only one child
             TreeNode childNode = node.hasLeftChild() ? node.getLeftChild() : node.getRightChild();
 
             childNode.setParentNode(parentNode);
 
-            if (parentNode != null && parentNode.getLeftChild() == node) {
+            if (parentNode != null && node.isLeftChildOf(parentNode)) {
                 parentNode.setLeftChild(childNode);
-            } else if (parentNode != null && parentNode.getRightChild() == node) {
+            } else if (parentNode != null && node.isRightChildOf(parentNode)) {
                 parentNode.setRightChild(childNode);
             } else if (parentNode == null) {
                 rootNode = childNode;
-            } else {
-                throw new RuntimeException("This should never happen");
             }
+            nodeToStartRebalance = parentNode;
         } else {    //node has both left and right children
             final TreeNode newNode = findMinKeyNode(node.getRightChild());
+            nodeToStartRebalance = newNode.getParentNode();
             node.setKey(newNode.getKey());
             remove(node.getRightChild(), key);
         }
-
         size -= 1;
-        return true;
+        return nodeToStartRebalance;
+    }
+
+    protected void balance(final TreeNode node) {
+
     }
 
     private TreeNode searchNodeRecursive(final TreeNode currentNode, final int key) {
@@ -106,32 +110,86 @@ public class BinarySearchTree extends Tree {
         return null;
     }
 
-    private TreeNode searchParentIterative(final int key) {
+    private TreeNode searchParentToInsert(final int key) {
         TreeNode currentParent = null;
         TreeNode current = rootNode;
+
         while(current != null) {
             currentParent = current;
             current = key <= current.getKey() ? current.getLeftChild() : current.getRightChild();
         }
+
         return currentParent;
     }
 
-    private void replaceChildNode(final TreeNode parentNode, final TreeNode oldNode, final TreeNode newNode) {
 
-    }
-
-    public TreeNode findMinKeyNode(TreeNode node) {
+    protected TreeNode findMinKeyNode(TreeNode node) {
         while(node.hasLeftChild()) {
             node = node.getLeftChild();
         }
         return node;
     }
 
-    public TreeNode findMaxKeyNode(TreeNode node) {
+    protected TreeNode findMaxKeyNode(TreeNode node) {
         while(node.hasRightChild()) {
             node = node.getRightChild();
         }
         return node;
+    }
+
+    protected void rotateLeft(TreeNode x) {
+        if (x == null) {
+            return;
+        }
+
+        final TreeNode parent = x.getParentNode();
+        final TreeNode y = x.getRightChild();
+        if (y.isLeaf()) {
+            return;
+        }
+
+        final TreeNode b = y.getLeftChild();
+
+        x.setRightChild(b);
+        y.setLeftChild(x);
+
+        if (parent != null) {
+            if (parent.getLeftChild() == x) {
+                parent.setLeftChild(y);
+            } else if (parent.getRightChild() == x) {
+                parent.setRightChild(y);
+            }
+        } else {
+            y.setParentNode(null);
+            rootNode = y;
+        }
+    }
+
+    protected void rotateRight(TreeNode y) {
+        if (y == null) {
+            return;
+        }
+
+        final TreeNode parent = y.getParentNode();
+        final TreeNode x = y.getLeftChild();
+        if (x.isLeaf()) {
+            return;
+        }
+
+        final TreeNode b = x.getRightChild();
+
+        y.setLeftChild(b);
+        x.setRightChild(y);
+
+        if (parent != null) {
+            if (parent.getRightChild() == y) {
+                parent.setRightChild(x);
+            } else if (parent.getLeftChild() == y) {
+                parent.setLeftChild(x);
+            }
+        } else {
+            rootNode = x;
+        }
     }
 
     public TreeNode successor(TreeNode node) {

@@ -7,6 +7,7 @@ import util.U;
 public class Program {
     public static void main(String[] args) {
         testBST();
+        StringBuilder b = new StringBuilder();
     }
 
     private static void testBST() {

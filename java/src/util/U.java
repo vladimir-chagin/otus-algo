@@ -184,4 +184,8 @@ public final class U {
     public static void printArray(Object[] array) {
         System.out.println(Arrays.toString(array));
     }
+
+    int max(int a, int b) {
+        return a >= b ? a : b;
+    }
 }
