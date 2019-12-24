@@ -1,7 +1,7 @@
 package task9_AVLtree;
 
+import task9_AVLtree.impl.AVLTree;
 import task9_AVLtree.impl.BinarySearchTree;
-import task9_AVLtree.impl.TreeNode;
 import util.Performance;
 import util.U;
 
@@ -16,8 +16,8 @@ public class Program {
         final StringBuilder report = new StringBuilder();
         final BinarySearchTree orderedTree = new BinarySearchTree();
         final BinarySearchTree randomTree = new BinarySearchTree();
-        final BinarySearchTree avlOrderedTree = new TreeNode.AVLTree();
-        final BinarySearchTree avlRandomTree = new TreeNode.AVLTree();
+        final BinarySearchTree avlOrderedTree = new AVLTree();
+        final BinarySearchTree avlRandomTree = new AVLTree();
 
         testBinaryTree(orderedTree, "BST Ordered", true, maxSize, report);
         report.append("\r\n");
