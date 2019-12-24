@@ -1,6 +1,7 @@
 package task9_AVLtree;
 
 import task9_AVLtree.impl.BinarySearchTree;
+import task9_AVLtree.impl.avl.AVLTree;
 import util.Performance;
 import util.U;
 
@@ -15,17 +16,22 @@ public class Program {
         final StringBuilder report = new StringBuilder();
         final BinarySearchTree orderedTree = new BinarySearchTree();
         final BinarySearchTree randomTree = new BinarySearchTree();
+        final BinarySearchTree avlOrderedTree = new AVLTree();
+        final BinarySearchTree avlRandomTree = new AVLTree();
 
-        testBinaryTree(orderedTree, true, maxSize, report);
+        testBinaryTree(orderedTree, "BST Ordered", true, maxSize, report);
         report.append("\r\n");
-        testBinaryTree(randomTree, false, maxSize, report);
+        testBinaryTree(randomTree, "BST Random", false, maxSize, report);
         report.append("\r\n");
-
+        testBinaryTree(avlOrderedTree, "AVL Ordered", true, maxSize, report);
+        report.append("\r\n");
+        testBinaryTree(avlRandomTree, "AVL Random", false, maxSize, report);
+        report.append("\r\n");
         System.out.println(report.toString());
     }
 
-    private static void testBinaryTree(final BinarySearchTree tree, final boolean ordered, final int maxSize, StringBuilder r) {
-        r.append(ordered ? "Ordered" : "Random").append("|");
+    private static void testBinaryTree(final BinarySearchTree tree, final String msg, final boolean ordered, final int maxSize, StringBuilder r) {
+        r.append(msg).append("|");
         final long insertDuration = Performance.measure(() -> {
             testInsert(tree, ordered, maxSize);
         });

@@ -23,7 +23,16 @@ public class TreeNode {
         this.leftChild = leftChild;
         this.rightChild = rightChild;
         this.key = key;
-        this.height = -1;
+        this.height = 0;
+    }
+
+
+    public void setKey(int val) {
+        key = val;
+    }
+
+    public int getKey() {
+        return key;
     }
 
 
@@ -32,11 +41,11 @@ public class TreeNode {
     }
 
     public void setLeftChild(TreeNode node) {
-        leftChild = node;
+        this.leftChild = node;
         if (node != null) {
             node.setParentNode(this);
         }
-        height = -1;
+        this.resetHeight();
     }
 
     public boolean hasLeftChild() {
@@ -52,19 +61,11 @@ public class TreeNode {
         if (node != null) {
             node.setParentNode(this);
         }
-        height = -1;
+        this.resetHeight();
     }
 
     public boolean hasRightChild() {
         return rightChild != null;
-    }
-
-    public void setKey(int val) {
-        key = val;
-    }
-
-    public int getKey() {
-        return key;
     }
 
     public TreeNode getParentNode() {
@@ -79,12 +80,12 @@ public class TreeNode {
         return this.parentNode != null;
     }
 
-    public boolean isLeftChildOf(final TreeNode parent) {
-        return parent != null && parent.getLeftChild() == this;
+    public boolean isLeftChild() {
+        return this.parentNode != null && this.parentNode.getLeftChild() == this;
     }
 
-    public boolean isRightChildOf(final TreeNode parent) {
-        return parent != null && parent.getRightChild() == this;
+    public boolean isRightChild() {
+        return this.parentNode != null && this.parentNode.getRightChild() == this;
     }
 
     public boolean isLeaf() {
@@ -115,21 +116,17 @@ public class TreeNode {
         key = 0;
     }
 
-    public int getHeight() {
-        if (height < 0) {
-            height = calcHeight(this);
-        }
-        return height;
+    public void resetHeight() {
+        this.height = 0;
     }
 
-    private static int calcHeight(TreeNode node) {
-        if (node == null || node.isLeaf()) {
-            return 0;
+    public int getHeight() {
+        if (height <= 0) {
+            final int lh = this.leftChild != null ? this.leftChild.getHeight() : 0;
+            final int rh = this.rightChild != null ? this.rightChild.getHeight() : 0;
+            this.height = Math.max(lh, rh) + 1;
         }
 
-        final int lh = calcHeight(node.getLeftChild());
-        final int rh = calcHeight(node.getRightChild());
-
-        return Math.max(lh, rh) + 1;
+        return height;
     }
 }

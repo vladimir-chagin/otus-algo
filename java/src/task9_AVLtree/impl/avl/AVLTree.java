@@ -4,32 +4,10 @@ import task9_AVLtree.impl.BinarySearchTree;
 import task9_AVLtree.impl.TreeNode;
 
 public class AVLTree extends BinarySearchTree {
-    public void rotateRight(final TreeNode pivotNode) {
-        if (pivotNode == null || !pivotNode.hasParentNode()) {
-            return;
-        }
-
-        final TreeNode parent = pivotNode.getParentNode();
-        if (height(pivotNode) - height(parent.getRightChild()) > 1 && height(pivotNode.getRightChild()) <= height(pivotNode.getLeftChild())) {
-            super.rotateRight(pivotNode);
-        }
-    }
-
-    public void rotateLeft(TreeNode pivotNode) {
-        if (pivotNode == null || !pivotNode.hasParentNode()) {
-            return;
-        }
-
-        final TreeNode parent = pivotNode.getParentNode();
-        if (height(pivotNode) - height(parent.getLeftChild()) < -1 && height(pivotNode.getLeftChild()) <= height(pivotNode.getRightChild())) {
-            super.rotateLeft(pivotNode);
-        }
-    }
-
     public void insert(int key) {
         final TreeNode newNode = new TreeNode(key);
         super.insert(newNode);
-        balance(newNode);
+        balance(newNode.getParentNode());
     }
 
     public void remove(int key) {
@@ -42,18 +20,22 @@ public class AVLTree extends BinarySearchTree {
             return;
         }
 
-        node.getHeight();
-
-        if (balanceFactor(node) >= 2) {
-            if (balanceFactor(node.getRightChild()) < 0) {
-                rotateRight(node.getRightChild());
+        if (!node.isLeaf()) {
+            node.getHeight();
+            final int bf = balanceFactor(node);
+            if (bf >= 2) {
+                final int bfR = balanceFactor(node.getRightChild());
+                if (bfR < 0) {
+                    rotateRight(node.getRightChild());
+                }
+                rotateLeft(node);
+            } else if (bf <= -2) {
+                final int bfL = balanceFactor(node.getLeftChild());
+                if (bfL > 0) {
+                    rotateLeft(node.getLeftChild());
+                }
+                rotateRight(node);
             }
-            rotateLeft(node);
-        } else if (balanceFactor(node) <= -2) {
-            if (balanceFactor(node.getLeftChild()) > 0) {
-                rotateLeft(node.getLeftChild());
-            }
-            rotateRight(node);
         }
 
         balance(node.getParentNode());
@@ -65,6 +47,8 @@ public class AVLTree extends BinarySearchTree {
     }
 
     private static int balanceFactor(TreeNode node) {
-        return height(node.getLeftChild()) - height(node.getRightChild());
+        final int rh = height(node.getRightChild());
+        final int lh = height(node.getLeftChild());
+        return rh - lh;
     }
 }

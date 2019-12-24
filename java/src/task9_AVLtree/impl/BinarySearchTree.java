@@ -46,9 +46,9 @@ public class BinarySearchTree extends AbstractTree {
         TreeNode parentNode = node.getParentNode();
         TreeNode nodeToStartRebalance;
         if (node.isLeaf()) {//isLeaf
-            if (parentNode != null && node.isLeftChildOf(parentNode)) {
+            if (parentNode != null && node.isLeftChild()) {
                 parentNode.setLeftChild(null);
-            } else if (parentNode != null && node.isRightChildOf(parentNode)) {
+            } else if (parentNode != null && node.isRightChild()) {
                 parentNode.setRightChild(null);
             } else if (parentNode == null) {
                 rootNode = null;
@@ -60,9 +60,9 @@ public class BinarySearchTree extends AbstractTree {
 
             childNode.setParentNode(parentNode);
 
-            if (parentNode != null && node.isLeftChildOf(parentNode)) {
+            if (parentNode != null && node.isLeftChild()) {
                 parentNode.setLeftChild(childNode);
-            } else if (parentNode != null && node.isRightChildOf(parentNode)) {
+            } else if (parentNode != null && node.isRightChild()) {
                 parentNode.setRightChild(childNode);
             } else if (parentNode == null) {
                 rootNode = childNode;
@@ -115,6 +115,7 @@ public class BinarySearchTree extends AbstractTree {
         TreeNode current = rootNode;
 
         while(current != null) {
+            current.resetHeight();
             currentParent = current;
             current = key <= current.getKey() ? current.getLeftChild() : current.getRightChild();
         }
@@ -137,58 +138,62 @@ public class BinarySearchTree extends AbstractTree {
         return node;
     }
 
-    protected void rotateLeft(TreeNode x) {
-        if (x == null) {
+    protected void rotateLeft(TreeNode q) {
+        if (q == null) {
             return;
         }
 
-        final TreeNode parent = x.getParentNode();
-        final TreeNode y = x.getRightChild();
-        if (y.isLeaf()) {
-            return;
-        }
+        final TreeNode parent = q.getParentNode();
 
-        final TreeNode b = y.getLeftChild();
+        final boolean isLeftChild = q.isLeftChild();
+        final boolean isRightChild = q.isRightChild();
 
-        x.setRightChild(b);
-        y.setLeftChild(x);
+        final TreeNode p = q.getRightChild();
+//        if (p.isLeaf()) {
+//            return;
+//        }
 
-        if (parent != null) {
-            if (parent.getLeftChild() == x) {
-                parent.setLeftChild(y);
-            } else if (parent.getRightChild() == x) {
-                parent.setRightChild(y);
-            }
-        } else {
-            y.setParentNode(null);
-            rootNode = y;
-        }
+        q.setRightChild(p.getLeftChild());
+        p.setLeftChild(q);
+
+        fixParentLink(parent, isLeftChild, isRightChild, p);
     }
 
-    protected void rotateRight(TreeNode y) {
-        if (y == null) {
+    protected void rotateRight(TreeNode p) {
+        if (p == null) {
             return;
         }
 
-        final TreeNode parent = y.getParentNode();
-        final TreeNode x = y.getLeftChild();
-        if (x.isLeaf()) {
-            return;
-        }
+        final TreeNode parent = p.getParentNode();
 
-        final TreeNode b = x.getRightChild();
+        final boolean isLeftChild = p.isLeftChild();
+        final boolean isRightChild = p.isRightChild();
 
-        y.setLeftChild(b);
-        x.setRightChild(y);
+        final TreeNode q = p.getLeftChild();
+//        if (q.isLeaf()) {
+//            return;
+//        }
 
+        p.setLeftChild(q.getRightChild());
+        q.setRightChild(p);
+
+        fixParentLink(parent, isLeftChild, isRightChild, q);
+    }
+
+    private void fixParentLink(final TreeNode parent, final boolean isLeftChild, final boolean isRightChild, final TreeNode child) {
         if (parent != null) {
-            if (parent.getRightChild() == y) {
-                parent.setRightChild(x);
-            } else if (parent.getLeftChild() == y) {
-                parent.setLeftChild(x);
+            if (isLeftChild) {
+                parent.setLeftChild(child);
+            } else if (isRightChild) {
+                parent.setRightChild(child);
+            } else {
+                throw new RuntimeException("Not possible");
             }
+            parent.getHeight();
         } else {
-            rootNode = x;
+            rootNode = child;
+            child.setParentNode(null);
+            child.getHeight();
         }
     }
 
