@@ -11,7 +11,6 @@ public class AVLTree extends BinarySearchTree {
         super.remove(key);
     }
 
-    @Override
     protected void balance(final TreeNode node) {
         if (node == null) {
             return;

@@ -33,7 +33,6 @@ public class BinarySearchTree extends AbstractTree {
     @Override
     public void remove(int key) {
         final TreeNode node = remove(rootNode, key);
-        balance(node);
     }
 
     protected final TreeNode remove(final TreeNode root, final int key) {
@@ -43,8 +42,8 @@ public class BinarySearchTree extends AbstractTree {
             return null;
         }
 
-        TreeNode parentNode = node.getParentNode();
-        TreeNode nodeToStartRebalance;
+        final TreeNode parentNode = node.getParentNode();
+        final TreeNode nodeToStartRebalance;
         if (node.isLeaf()) {//isLeaf
             if (parentNode != null && node.isLeftChild()) {
                 parentNode.setLeftChild(null);
@@ -78,10 +77,6 @@ public class BinarySearchTree extends AbstractTree {
         return nodeToStartRebalance;
     }
 
-    protected void balance(final TreeNode node) {
-
-    }
-
     private TreeNode searchNodeRecursive(final TreeNode currentNode, final int key) {
         if (currentNode == null || currentNode.getKey() == key) {
             return currentNode;
@@ -90,7 +85,7 @@ public class BinarySearchTree extends AbstractTree {
         return key <= currentNode.getKey() ? searchNodeRecursive(currentNode.getLeftChild(), key) : searchNodeRecursive(currentNode.getRightChild(), key);
     }
 
-    private TreeNode searchNodeIterative(final int key) {
+    protected TreeNode searchNodeIterative(final int key) {
         return searchNodeIterative(rootNode, key);
     }
 
@@ -122,7 +117,6 @@ public class BinarySearchTree extends AbstractTree {
 
         return currentParent;
     }
-
 
     protected TreeNode findMinKeyNode(TreeNode node) {
         while(node.hasLeftChild()) {
@@ -197,7 +191,7 @@ public class BinarySearchTree extends AbstractTree {
         }
     }
 
-    public TreeNode successor(TreeNode node) {
+    public TreeNode successor(final TreeNode node) {
         if (node.hasRightChild()) {
             return findMinKeyNode(node.getRightChild());
         }

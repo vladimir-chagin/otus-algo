@@ -130,4 +130,19 @@ public class TreeNode {
         return height;
     }
 
+    public TreeNode getGrandParentNode() {
+        return hasParentNode() && parentNode.hasParentNode() ? parentNode.getParentNode() : null;
+    }
+
+    public TreeNode getUncleNode() {
+        return hasParentNode() ? parentNode.getSiblingNode() : null;
+    }
+
+    public TreeNode getSiblingNode() {
+        return hasParentNode()
+                ? (isLeftChild()
+                    ? parentNode.getRightChild()
+                    : parentNode.getLeftChild()
+                ) : null;
+    }
 }
